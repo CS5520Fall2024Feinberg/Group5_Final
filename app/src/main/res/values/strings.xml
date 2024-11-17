@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">group5_final</string>
+    <string name="txt_welcome">"Welcome To BeatConnect "</string>
+    <string name="txt_username">Username:</string>
+    <string name="txt_password">Password:</string>
+    <string name="txt_signup">Sign up!</string>
+    <string name="btn_login">Login</string>
+    <string name="etxt_password" />
+</resources>
