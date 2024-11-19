@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "16074786585",
+    "firebase_url": "https://cs5520-group5-final-default-rtdb.firebaseio.com",
+    "project_id": "cs5520-group5-final",
+    "storage_bucket": "cs5520-group5-final.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:16074786585:android:55e4a871599f97b410a788",
+        "android_client_info": {
+          "package_name": "edu.northeastern.group5_final"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSU2J9fpWlevuxpHg4gIK_KryFE9K9Hms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
