@@ -1,6 +1,8 @@
 package edu.northeastern.group5_final;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +18,10 @@ public class loginPage extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login_page);
 
-
+        Button btnSeach = findViewById(R.id.btn_lp_search);
+        btnSeach.setOnClickListener(v -> {
+            startActivity(new Intent(this, SearchActivity.class));
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

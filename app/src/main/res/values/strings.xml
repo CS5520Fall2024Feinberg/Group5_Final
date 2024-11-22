@@ -15,4 +15,12 @@
     <string name="enter_your_first_name">enter your first name</string>
     <string name="btn_su_signup">Sign Up!</string>
     <string name="txt_lp_name">N/A</string>
+    <string name="btn_lp_edit">Edit</string>
+    <string name="btn_lp_seach">Search</string>
+    <string name="btn_lp_messages">Messages</string>
+    <string name="btn_src_view">View</string>
+    <string name="txt_userFullName">N/A</string>
+    <string name="btn_search">Search</string>
+    <string name="rbtn_sa_users">Music Artists</string>
+    <string name="rbtn_sa_bands">Music Groups</string>
 </resources>
