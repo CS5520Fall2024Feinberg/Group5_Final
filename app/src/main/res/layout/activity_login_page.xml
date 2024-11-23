@@ -7,6 +7,45 @@
     android:layout_height="match_parent"
     tools:context=".loginPage">
 
+    <!-- Toolbar -->
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="408dp"
+        android:layout_height="51dp"
+        android:background="?attr/colorPrimary"
+        android:titleTextColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="Login Page">
+
+        <!-- Button inside the Toolbar -->
+
+        <Button
+            android:id="@+id/btn_messages"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:text="Messages"
+            android:textColor="@android:color/white" />
+        <Button
+            android:id="@+id/btn_search"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:text="Search"
+            android:textColor="@android:color/white" />
+
+
+    </androidx.appcompat.widget.Toolbar>
+
     <ImageView
         android:id="@+id/imv_profilePic"
         android:layout_width="152dp"
@@ -16,7 +55,7 @@
         app:layout_constraintHorizontal_bias="0.061"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_lp_edit"
-        app:layout_constraintVertical_bias="0.028"
+        app:layout_constraintVertical_bias="0.111"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -38,10 +77,10 @@
         android:text="@string/btn_lp_messages"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.377"
+        app:layout_constraintHorizontal_bias="0.244"
         app:layout_constraintStart_toEndOf="@+id/btn_lp_search"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.093" />
 
     <Button
         android:id="@+id/btn_lp_search"
@@ -50,10 +89,10 @@
         android:text="@string/btn_lp_seach"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.175"
+        app:layout_constraintHorizontal_bias="0.176"
         app:layout_constraintStart_toEndOf="@+id/btn_lp_edit"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.093" />
 
     <Button
         android:id="@+id/btn_lp_edit"
@@ -62,8 +101,10 @@
         android:text="@string/btn_lp_edit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.109"
+        app:layout_constraintHorizontal_bias="0.114"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.093" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

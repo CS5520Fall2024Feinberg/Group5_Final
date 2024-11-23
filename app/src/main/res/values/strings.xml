@@ -23,4 +23,11 @@
     <string name="btn_search">Search</string>
     <string name="rbtn_sa_users">Music Artists</string>
     <string name="rbtn_sa_bands">Music Groups</string>
+
+    <!-- Dropdown Items for Menu -->
+    <string-array name="dropdownMenu_items">
+        <item>Option 1</item>
+        <item>Option 2</item>
+        <item>Option 3</item>
+    </string-array>
 </resources>
