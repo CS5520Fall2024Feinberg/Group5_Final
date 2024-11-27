@@ -23,6 +23,13 @@
     <string name="btn_search">Search</string>
     <string name="rbtn_sa_users">Music Artists</string>
     <string name="rbtn_sa_bands">Music Groups</string>
+    <string name="btn_compose">Compose</string>
+    <string name="txt_inbox">Inbox(0)</string>
+    <string name="btn_cm_send">Send</string>
+    <string name="btn_cm_cancel">Cancel</string>
+    <string name="txt_cm_receiver">To:</string>
+    <string name="txt_cm_subject">Subject:</string>
+    <string name="txt_cm_message">Message:</string>
 
     <!-- Dropdown Items for Menu -->
     <string-array name="dropdownMenu_items">

@@ -1,16 +1,12 @@
-package edu.northeastern.group5_final;
+package edu.northeastern.group5_final.messaging;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Spinner;
-import android.widget.Toast;
-
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,33 +15,41 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.util.ArrayList;
+import edu.northeastern.group5_final.R;
+import edu.northeastern.group5_final.SearchActivity;
+import edu.northeastern.group5_final.loginPage;
 
-import edu.northeastern.group5_final.messaging.InboxActivity;
+public class InboxActivity extends AppCompatActivity {
 
-public class loginPage extends AppCompatActivity {
+    Dialog composeDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_login_page);
+        setContentView(R.layout.activity_inbox);
+
+        composeDialog = new Dialog(InboxActivity.this);
+        composeDialog.setContentView(R.layout.compose_message);
+        composeDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
 
-        Button btnSearch = findViewById(R.id.btn_search);
-        btnSearch.setOnClickListener(v -> {
-            startActivity(new Intent(this, SearchActivity.class));
+        Button btnCompose = findViewById(R.id.btn_compse);
+        btnCompose.setOnClickListener(v -> {
+            composeDialog.show();
         });
 
-        Button btnMessages = findViewById(R.id.btn_messages);
-        btnMessages.setOnClickListener(v -> {
-            startActivity(new Intent(this, InboxActivity.class));
-        });
-
-        // Set up the Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //Set up nav menu
+        Button btn_search = findViewById(R.id.btn_search);
+        Button btnHome = findViewById(R.id.btn_home);
+        btn_search.setOnClickListener(v -> {
+            startActivity(new Intent(this, SearchActivity.class));
+        });
+        btnHome.setOnClickListener(v -> {
+                    startActivity(new Intent(this, loginPage.class));
+        });
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
