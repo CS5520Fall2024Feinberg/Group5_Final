@@ -1,0 +1,53 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="16dp"
+        android:text="Add a Song"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/open_file_picker_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose a File" />
+
+    <EditText
+        android:id="@+id/edit_song_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter song title"
+        android:paddingTop="50dp"
+        android:visibility="gone" />
+
+    <EditText
+        android:id="@+id/edit_artist_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter artist name"
+        android:paddingVertical="15dp"
+        android:visibility="gone" />
+
+    <Spinner
+        android:id="@+id/genre_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="50dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/confirm_add_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Song"
+        android:visibility="gone" />
+</LinearLayout>

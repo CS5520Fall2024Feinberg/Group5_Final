@@ -5,12 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:backgroundTint="@color/white"
+    android:background="#FAF6EF"
+    android:backgroundTint="#f7f2e8"
     app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
-    app:strokeColor="@color/colorGray"
-    app:strokeWidth="5dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#c0b7a8"
+    app:strokeWidth="1dp"
     card_view:cardElevation="2dp">
+
 
     <LinearLayout
         android:layout_width="match_parent"
