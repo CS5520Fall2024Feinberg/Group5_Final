@@ -22,5 +22,6 @@
         app:itemIconTint="@color/black"
         app:itemTextColor="@color/black"
         app:labelVisibilityMode="unlabeled"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"
+        app:shapeAppearanceOverlay="@style/BorderStyle" />
 </RelativeLayout>
