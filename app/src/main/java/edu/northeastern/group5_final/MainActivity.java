@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                             String storedPassword = userSnapshot.child("password").getValue(String.class);
                             if(storedPassword.equals(password) && storedPassword != null){
                                 Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(MainActivity.this, loginPage.class);
+                                Intent intent = new Intent(MainActivity.this, Dashboard.class);
                                 intent.putExtra("username", username);
                                 startActivity(intent);
                                 finish();
