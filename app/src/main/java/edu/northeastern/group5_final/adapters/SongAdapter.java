@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +68,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
                 pauseSong(position);
             } else {
                 playSong(position);
-                updateProgressBar(holder.progressBar);
             }
         });
 
@@ -75,6 +76,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             song.setFavorite(!song.isFavorite());
             notifyItemChanged(position);
         });
+
+        if (position == currentlyPlayingIndex) {
+            updateProgressBar(holder);
+        } else {
+            holder.progressBar.setProgress(0);
+        }
     }
 
     @Override
@@ -115,16 +122,22 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             mediaPlayer.release();
         }
 
-        mediaPlayer = MediaPlayer.create(context, R.raw.sample_song2);
-        mediaPlayer.start();
+        try {
+            mediaPlayer = MediaPlayer.create(context, song.getSongId());
+            mediaPlayer.start();
 
-        notifyDataSetChanged();
-
-        mediaPlayer.setOnCompletionListener(mp -> {
-            song.setPlaying(false);
             notifyItemChanged(position);
-            currentlyPlayingIndex = -1;
-        });
+
+            mediaPlayer.setOnCompletionListener(mp -> {
+                song.setPlaying(false);
+                notifyItemChanged(position);
+                currentlyPlayingIndex = -1;
+
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void pauseSong(int position) {
@@ -138,19 +151,31 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     }
 
 
-    private void updateProgressBar(ProgressBar progressBar) {
-        Handler handler = new Handler();
+    private void updateProgressBar(SongViewHolder holder) {
+        if (mediaPlayer == null) {
+            return;
+        }
+
+        ProgressBar progressBar = holder.progressBar;
+        Handler handler = new Handler(Looper.getMainLooper());
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                    int progress = (int) (mediaPlayer.getCurrentPosition() * 100 / mediaPlayer.getDuration());
-                    progressBar.setProgress(progress);
-                    handler.postDelayed(this, 1000);
+                    int progress = (int) ((mediaPlayer.getCurrentPosition() * 100) / mediaPlayer.getDuration());
+                    handler.postDelayed(this, 100);
+                    holder.progressBar.post(() -> holder.progressBar.setProgress(progress));
                 }
             }
         };
         handler.post(runnable);
+
+        mediaPlayer.setOnCompletionListener(mp -> {
+            progressBar.setProgress(100);
+            handler.removeCallbacksAndMessages(null);
+        });
+
     }
+
 
 }

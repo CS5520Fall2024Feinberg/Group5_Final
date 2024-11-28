@@ -7,15 +7,17 @@ public class Song {
     private boolean isPlaying;
     private boolean isFavorite;
     private int progress;
+    private int songId;
 
 
-    public Song(String title, String artist, String genre, boolean isPlaying, boolean isFavorite, int progress) {
+    public Song(String title, String artist, String genre, boolean isPlaying, boolean isFavorite, int progress, int songId) {
         this.title = title;
         this.artist = artist;
         this.genre = genre;
         this.isPlaying = isPlaying;
         this.isFavorite = isFavorite;
         this.progress = progress;
+        this.songId = songId;
     }
 
     public String getTitle() {
@@ -59,4 +61,13 @@ public class Song {
     public void setProgress(int progress) {
         this.progress = progress;
     }
+
+    public int getSongId() {
+        return songId;
+    }
+
+    public void setSongId(int songId) {
+        this.songId = songId;
+    }
+
 }

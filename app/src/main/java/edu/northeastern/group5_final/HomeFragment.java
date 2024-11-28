@@ -27,29 +27,20 @@ public class HomeFragment extends Fragment {
 
         // Dummy song data
         List<Song> songList = new ArrayList<>();
-        songList.add(new Song("Song 1", "Artist 1", "rock", false, false, 25));
-        songList.add(new Song("Song 2", "Artist 2", "countryside", true, true, 50));
-        songList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 75));
-        songList.add(new Song("Song 1", "Artist 1", "rock", false, false, 25));
-        songList.add(new Song("Song 2", "Artist 2", "countryside", false, true, 50));
-        songList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 75));
-        songList.add(new Song("Song 1", "Artist 1", "rock", false, false, 25));
-        songList.add(new Song("Song 2", "Artist 2", "countryside", false, true, 50));
-        songList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 75));
-        songList.add(new Song("Song 1", "Artist 1", "rock", false, false, 25));
-        songList.add(new Song("Song 2", "Artist 2", "countryside", false, true, 50));
-        songList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 75));
-        songList.add(new Song("Song 1", "Artist 1", "rock", false, false, 25));
-        songList.add(new Song("Song 2", "Artist 2", "countryside", false, true, 50));
-        songList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 75));
-        songList.add(new Song("Song 1", "Artist 1", "rock", false, false, 25));
-        songList.add(new Song("Song 2", "Artist 2", "countryside", false, true, 50));
-        songList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 75));
+        songList.add(new Song("Song 1", "Artist 1", "rock", false, false, 0, R.raw.sample_song2));
+        songList.add(new Song("Song 2", "Artist 2", "countryside", false, true, 0, R.raw.sample_song3));
+        songList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 0, R.raw.sample_song));
 
         SongAdapter adapter = new SongAdapter(getContext(), songList);
         recyclerView.setAdapter(adapter);
 
         return view;
+    }
+
+    private String generateSongURIPath(int songId) {
+
+        return "android.resource://" + getContext().getPackageName() + "/" + songId;
+
     }
 }
 
