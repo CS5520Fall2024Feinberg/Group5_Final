@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +28,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
     private final List<Song> songs;
     private final Context context;
+    private MediaPlayer mediaPlayer;
     private int currentlyPlayingIndex = -1;
 
     public SongAdapter(Context context, List<Song> songs) {
@@ -60,17 +63,11 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         holder.playPauseButton.setOnClickListener(v -> {
             if (song.isPlaying()) {
-                song.setPlaying(false);
-                currentlyPlayingIndex = -1;
+                pauseSong(position);
             } else {
-                if (currentlyPlayingIndex != -1 && currentlyPlayingIndex != position) {
-                    songs.get(currentlyPlayingIndex).setPlaying(false);
-                    notifyItemChanged(currentlyPlayingIndex);
-                }
-                song.setPlaying(true);
-                currentlyPlayingIndex = position;
+                playSong(position);
+                updateProgressBar(holder.progressBar);
             }
-            notifyItemChanged(position);
         });
 
 
@@ -103,5 +100,57 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         }
     }
 
+    private void playSong(int position) {
+        if (currentlyPlayingIndex != -1 && currentlyPlayingIndex != position) {
+            Song previousSong = songs.get(currentlyPlayingIndex);
+            previousSong.setPlaying(false);
+            notifyItemChanged(currentlyPlayingIndex);
+        }
+
+        Song song = songs.get(position);
+        song.setPlaying(true);
+        currentlyPlayingIndex = position;
+
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+        }
+
+        mediaPlayer = MediaPlayer.create(context, R.raw.sample_song2);
+        mediaPlayer.start();
+
+        notifyDataSetChanged();
+
+        mediaPlayer.setOnCompletionListener(mp -> {
+            song.setPlaying(false);
+            notifyItemChanged(position);
+            currentlyPlayingIndex = -1;
+        });
+    }
+
+    private void pauseSong(int position) {
+        currentlyPlayingIndex = -1;
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            Song song = songs.get(position);
+            song.setPlaying(false);
+            notifyItemChanged(position);
+        }
+    }
+
+
+    private void updateProgressBar(ProgressBar progressBar) {
+        Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    int progress = (int) (mediaPlayer.getCurrentPosition() * 100 / mediaPlayer.getDuration());
+                    progressBar.setProgress(progress);
+                    handler.postDelayed(this, 1000);
+                }
+            }
+        };
+        handler.post(runnable);
+    }
 
 }
