@@ -18,8 +18,9 @@ public class Artist {
     private Status status;
     private String bio;
     private String username;
+    private boolean isIndividual;
 
-    public Artist(String name, String joinedDate, List<String> songNames, Uri profilePicture, int totalSongsReleased, String username, String bio) {
+    public Artist(String name, String joinedDate, List<String> songNames, Uri profilePicture, int totalSongsReleased, String username, String bio, boolean isInvidual) {
         this.name = name;
         this.joinedDate = joinedDate;
         this.songNames = songNames;
@@ -28,7 +29,7 @@ public class Artist {
         this.status = Status.PLUS;
         this.username = username;
         this.bio = bio;
-
+        this.isIndividual = isInvidual;
     }
 
     public String getName() {
@@ -73,6 +74,14 @@ public class Artist {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public boolean getIsIndividual() {
+        return isIndividual;
+    }
+
+    public void setIsIndividual(boolean isIndividual) {
+        this.isIndividual = isIndividual;
     }
 
 }

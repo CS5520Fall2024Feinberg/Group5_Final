@@ -3,17 +3,22 @@ package edu.northeastern.group5_final.models;
 import android.net.Uri;
 
 public class Request {
+    private Artist requestee;
     private String requesteeUsername;
     private String message;
     private String suggestedBandName;
     private Uri profilePicture;
 
-    public Request(String requesteeUsername, String message, String suggestedBandName, Uri profilePicture) {
+    public Request(Artist requestee, String requesteeUsername, String message, String suggestedBandName, Uri profilePicture) {
+        this.requestee = requestee;
         this.requesteeUsername = requesteeUsername;
         this.message = message;
         this.suggestedBandName = suggestedBandName;
         this.profilePicture = profilePicture;
     }
+
+    public Artist getRequestee() { return requestee; }
+    public void setRequestee(Artist requestee) { this.requestee = requestee; }
 
     public String getRequesteeUsername() { return requesteeUsername; }
     public void setRequesteeUsername(String requesteeUsername) { this.requesteeUsername = requesteeUsername; }

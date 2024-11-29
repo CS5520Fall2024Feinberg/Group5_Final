@@ -4,6 +4,16 @@
     android:orientation="vertical"
     android:padding="20dp">
 
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:paddingBottom="26dp"
+        android:text="Artist Profile"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
     <ImageView
         android:id="@+id/dialog_artist_picture"
         android:layout_width="150dp"

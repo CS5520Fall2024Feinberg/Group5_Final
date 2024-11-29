@@ -79,7 +79,8 @@ public class CollabFragment extends Fragment {
                 null,
                 10,
                 "john_doe",
-                "Music lover and aspiring artist."
+                "Music lover and aspiring artist.",
+                true
         ));
         artistList.add(new Artist(
                 "Jane Smith",
@@ -88,27 +89,30 @@ public class CollabFragment extends Fragment {
                 Uri.parse("android.resource://" + getContext().getPackageName() + "/" + R.drawable.single_artist_icon),
                 15,
                 "jane_smith",
-                "Award-winning singer and songwriter."
+                "Award-winning singer and songwriter.",
+                true
         ));
         artistList.add(new Artist(
                 "One Direction",
                 "June 2002",
                 Arrays.asList("Song X", "Song Y", "Song Z"),
-                Uri.parse("android.resource://" + getContext().getPackageName() + "/" + R.drawable.artists_group_icon),
+                null,
                 150,
                 "one_D",
-                "Award-winning band and awesome gang!"
+                "Award-winning band and awesome gang!",
+                false
         ));
 
     }
 
 
     private void populateRequests() {
+        populate();
+
         requestList = new ArrayList<>();
-        requestList.add(new Request("user1", "Hey! Let's form a band.", "The Rockers", null));
-        requestList.add(new Request("user2", "Looking forward to collaborating.", "Sufi Stars",
-                Uri.parse("android.resource://" + getContext().getPackageName() + "/" + R.drawable.single_artist_icon)));
-        requestList.add(new Request("user3", "Would love to jam together!", "Country Vibes", null));
+        requestList.add(new Request(artistList.get(0), artistList.get(0).getUsername(), "Hey! Let's form a band.", "The Rockers", artistList.get(0).getProfilePicture()));
+        requestList.add(new Request(artistList.get(1), artistList.get(1).getUsername(), "Looking forward to collaborating.", "Sufi Stars", artistList.get(1).getProfilePicture()));
+        requestList.add(new Request(artistList.get(2), artistList.get(2).getUsername(), "Would love to jam together!", "Country Vibes", artistList.get(2).getProfilePicture()));
 
 
     }

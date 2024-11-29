@@ -50,7 +50,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
         if (artist.getProfilePicture() != null) {
             holder.artistPicture.setImageURI(artist.getProfilePicture());
         } else {
-            holder.artistPicture.setImageResource(R.drawable.single_artist_icon);
+            holder.artistPicture.setImageResource(artist.getIsIndividual() ? R.drawable.single_artist_icon : R.drawable.artists_group_icon);
         }
 
         switch (artist.getStatus()) {

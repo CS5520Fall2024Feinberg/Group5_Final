@@ -1,5 +1,6 @@
 package edu.northeastern.group5_final.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -9,10 +10,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import edu.northeastern.group5_final.R;
+import edu.northeastern.group5_final.models.Artist;
 import edu.northeastern.group5_final.models.Request;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
@@ -39,7 +42,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         if (request.getProfilePicture() != null) {
             holder.requesteePicture.setImageURI(request.getProfilePicture());
         } else {
-            holder.requesteePicture.setImageResource(R.drawable.single_artist_icon);
+            holder.requesteePicture.setImageResource(request.getRequestee().getIsIndividual() ?  R.drawable.single_artist_icon : R.drawable.artists_group_icon);
         }
 
         holder.requesteeUsername.setText(request.getRequesteeUsername());
@@ -55,6 +58,12 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             requestList.remove(position);
             notifyItemRemoved(position);
         });
+
+        Artist artist = request.getRequestee();
+        View.OnClickListener profileClickListener = v -> showArtistProfileDialog(artist);
+        holder.requesteePicture.setOnClickListener(profileClickListener);
+        holder.requesteeUsername.setOnClickListener(profileClickListener);
+
     }
 
     @Override
@@ -76,5 +85,33 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             acceptRequestButton = itemView.findViewById(R.id.btn_accept_request);
             rejectRequestButton = itemView.findViewById(R.id.btn_reject_request);
         }
+    }
+
+    private void showArtistProfileDialog(Artist artist) {
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_artist_profile, null);
+        AlertDialog dialog = new AlertDialog.Builder(context).setView(dialogView).create();
+
+        ImageView dialogArtistPicture = dialogView.findViewById(R.id.dialog_artist_picture);
+        TextView dialogArtistUsername = dialogView.findViewById(R.id.dialog_artist_username);
+        TextView dialogArtistName = dialogView.findViewById(R.id.dialog_artist_name);
+        TextView dialogArtistBio = dialogView.findViewById(R.id.dialog_artist_bio);
+        TextView dialogArtistJoinedDate = dialogView.findViewById(R.id.dialog_artist_joined_date);
+        RecyclerView dialogArtistSongsRecyclerView = dialogView.findViewById(R.id.dialog_artist_songs_recycler_view);
+
+        if (artist.getProfilePicture() != null) {
+            dialogArtistPicture.setImageURI(artist.getProfilePicture());
+        } else {
+            dialogArtistPicture.setImageResource(R.drawable.single_artist_icon);
+        }
+        dialogArtistUsername.setText("@" + artist.getUsername());
+        dialogArtistName.setText(artist.getName());
+        dialogArtistBio.setText(artist.getBio());
+        dialogArtistJoinedDate.setText("Joined: " + artist.getJoinedDate());
+
+        dialogArtistSongsRecyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+        ProfileSongsAdapter songsAdapter = new ProfileSongsAdapter(context, artist.getSongNames());
+        dialogArtistSongsRecyclerView.setAdapter(songsAdapter);
+
+        dialog.show();
     }
 }
