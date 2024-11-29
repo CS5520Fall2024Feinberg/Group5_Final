@@ -26,19 +26,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
-        TextView txtSignup = findViewById(R.id.txt_signup);
-        txtSignup.setOnClickListener(view -> {
+        Button btnSignup = findViewById(R.id.btn_sign_up);
+        btnSignup.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, Signup.class);
             startActivity(intent);
         });
 
-        EditText etxtUsername = findViewById(R.id.etxt_username);
-        EditText etxtPassword = findViewById(R.id.etxt_password);
+        EditText etxtUsername = findViewById(R.id.et_username);
+        EditText etxtPassword = findViewById(R.id.et_password);
 
 
-        Button btnLogin = findViewById(R.id.btn_login);
+        Button btnLogin = findViewById(R.id.btn_sign_in);
         btnLogin.setOnClickListener(view -> {
 
             String username = etxtUsername.getText().toString().trim();
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference usersRef = database.getReference("users");
+            DatabaseReference usersRef = database.getReference("artists");
 
             usersRef.orderByChild("username").equalTo(username).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -82,8 +82,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Login failed. Please try again." , Toast.LENGTH_SHORT).show();
                 }
             });
-
-
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

@@ -111,7 +111,7 @@ public class CollabFragment extends Fragment {
 
         requestList = new ArrayList<>();
         requestList.add(new Request(artistList.get(0), artistList.get(0).getUsername(), "Hey! Let's form a band.", "The Rockers", artistList.get(0).getProfilePicture()));
-        requestList.add(new Request(artistList.get(1), artistList.get(1).getUsername(), "Looking forward to collaborating.", "Sufi Stars", artistList.get(1).getProfilePicture()));
+        requestList.add(new Request(artistList.get(1), artistList.get(1).getUsername(), "Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating.", "Sufi Stars", artistList.get(1).getProfilePicture()));
         requestList.add(new Request(artistList.get(2), artistList.get(2).getUsername(), "Would love to jam together!", "Country Vibes", artistList.get(2).getProfilePicture()));
 
 
