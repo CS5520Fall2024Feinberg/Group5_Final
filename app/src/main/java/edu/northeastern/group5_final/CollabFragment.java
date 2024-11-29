@@ -42,10 +42,34 @@ public class CollabFragment extends Fragment {
 
     private void populate() {
         artistList = new ArrayList<>();
-        artistList.add(new Artist("John Doe", "Jan 2020", Arrays.asList("Song A", "Song B"), null,
-                10));
-        artistList.add(new Artist("One Direction", "June 1990", Arrays.asList("One", "Two", "Song Z"), Uri.parse("android.resource://" + requireContext().getPackageName() + "/" + R.drawable.artists_group_icon), 150));
-        artistList.add(new Artist("Jane Smith", "Feb 2019", Arrays.asList("Song X", "Song Y", "Song Z"), Uri.parse("android.resource://" + requireContext().getPackageName() + "/" + R.drawable.single_artist_icon), 15));
+        artistList.add(new Artist(
+                "John Doe",
+                "Jan 2020",
+                Arrays.asList("Song A", "Song B"),
+                null,
+                10,
+                "john_doe",
+                "Music lover and aspiring artist."
+        ));
+        artistList.add(new Artist(
+                "Jane Smith",
+                "Feb 2019",
+                Arrays.asList("Song X", "Song Y", "Song Z"),
+                Uri.parse("android.resource://" + getContext().getPackageName() + "/" + R.drawable.single_artist_icon),
+                15,
+                "jane_smith",
+                "Award-winning singer and songwriter."
+        ));
+        artistList.add(new Artist(
+                "One Direction",
+                "June 2002",
+                Arrays.asList("Song X", "Song Y", "Song Z"),
+                Uri.parse("android.resource://" + getContext().getPackageName() + "/" + R.drawable.artists_group_icon),
+                150,
+                "one_D",
+                "Award-winning band and awesome gang!"
+        ));
+
     }
 
 }

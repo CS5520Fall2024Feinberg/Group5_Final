@@ -27,18 +27,16 @@ public class Dashboard extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
             Fragment selectedFragment = null;
 
-            if (item.getItemId() == R.id.nav_collabs) {
-                selectedFragment = new CollabFragment();
+            if (item.getItemId() == R.id.nav_home) {
+                selectedFragment = new HomeFragment();
             } else if (item.getItemId() == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
             } else {
-                selectedFragment = new HomeFragment();
+                selectedFragment = new CollabFragment();
             }
 
             if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, selectedFragment)
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
             }
 
             return true;
