@@ -1,5 +1,6 @@
 package edu.northeastern.group5_final.messaging;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,8 @@ import edu.northeastern.group5_final.R;
 public class Inbox_recyclerViewAdapter extends RecyclerView.Adapter<Inbox_recyclerViewAdapter.MyViewHolder>{
     Context context;
     ArrayList<Messages> messages;
+    Dialog viewDialog;
+    Button btnClose;
 
     public Inbox_recyclerViewAdapter(Context context, ArrayList<Messages> messages){
         this.context = context;
@@ -39,6 +42,32 @@ public class Inbox_recyclerViewAdapter extends RecyclerView.Adapter<Inbox_recycl
         holder.txtSender.setText(messages.get(position).getReceiver());
         holder.txtSubject.setText(messages.get(position).getTopic());
         holder.txtDate.setText(messages.get(position).getDate());
+
+        holder.btnView.setOnClickListener(v -> {
+            viewDialog = new Dialog(Inbox_recyclerViewAdapter.this.context);
+            viewDialog.setContentView(R.layout.view_message);
+            viewDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            btnClose = viewDialog.findViewById(R.id.btn_mv_close);
+
+            Button btnClose = viewDialog.findViewById(R.id.btn_mv_close);
+
+            //setup
+            TextView txtmvDate = viewDialog.findViewById(R.id.txt_mv_dateVal);
+            TextView txtmvSubject = viewDialog.findViewById(R.id.txt_mv_subjectVal);
+            TextView txtmvSender = viewDialog.findViewById(R.id.txt_mv_senderVal);
+            TextView txtmvMessage = viewDialog.findViewById(R.id.txt_mv_messageVal);
+            txtmvDate.setText(messages.get(position).getDate());
+            txtmvSubject.setText(messages.get(position).getTopic());
+            txtmvSender.setText(messages.get(position).getSender());
+            txtmvMessage.setText(messages.get(position).getMessage());
+
+
+            // Close button on dialog
+            btnClose.setOnClickListener(view -> viewDialog.dismiss());
+
+            // Show the dialog
+            viewDialog.show();
+        });
     }
 
 

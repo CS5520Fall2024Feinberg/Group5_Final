@@ -32,6 +32,12 @@
     <string name="txt_cm_message">Message:</string>
     <string name="btn_view">View</string>
     <string name="txt_date">00/00/2024</string>
+    <string name="txt_mv_date">Date:</string>
+    <string name="txt_mv_dateVal">DD/MM/YYYY</string>
+    <string name="txt_mv_sender">From:</string>
+    <string name="txt_mv_subject">Subject:</string>
+    <string name="txt_mv_message">Message:</string>
+    <string name="btn_mv_close">Close</string>
 
     <!-- Dropdown Items for Menu -->
     <string-array name="dropdownMenu_items">
