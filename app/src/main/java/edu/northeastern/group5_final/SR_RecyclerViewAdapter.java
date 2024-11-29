@@ -46,19 +46,21 @@ public class SR_RecyclerViewAdapter extends RecyclerView.Adapter<SR_RecyclerView
     public int getItemCount() {
         return searchResults.size();
     }
+
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         ImageView profilePic;
-        TextView txtFullName;;
+        TextView txtFullName;
+        ;
         TextView txtMemberInfo;
         Button btnView;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            profilePic = itemView.findViewById(R.id.iv_userProfPic);
-            txtFullName = itemView.findViewById(R.id.txt_userFullName);
-            txtMemberInfo = itemView.findViewById(R.id.txt_memberInfo2);
+            profilePic = itemView.findViewById(R.id.artist_picture);
+            txtFullName = itemView.findViewById(R.id.artist_name);
+            txtMemberInfo = itemView.findViewById(R.id.artist_name);
 
         }
     }

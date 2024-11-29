@@ -1,12 +1,116 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    tools:context=".SearchActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Collab Screen"
-        android:textSize="24sp" />
-</LinearLayout>
+    <!-- Toolbar -->
+
+    <!--    <androidx.appcompat.widget.Toolbar-->
+    <!--        android:id="@+id/toolbar"-->
+    <!--        android:layout_width="408dp"-->
+    <!--        android:layout_height="51dp"-->
+    <!--        android:background="?attr/colorPrimary"-->
+    <!--        android:titleTextColor="@android:color/white"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintHorizontal_bias="0.0"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:layout_constraintVertical_bias="0.0"-->
+    <!--        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">-->
+
+    <!--        &lt;!&ndash; Button inside the Toolbar &ndash;&gt;-->
+
+    <!--        <Button-->
+    <!--            android:id="@+id/btn_messages"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:layout_gravity="end"-->
+    <!--            android:background="@android:color/transparent"-->
+    <!--            android:text="Messages"-->
+    <!--            android:textColor="@android:color/white" />-->
+
+    <!--        <Button-->
+    <!--            android:id="@+id/btn_home"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:layout_gravity="end"-->
+    <!--            android:background="@android:color/transparent"-->
+    <!--            android:text="Home"-->
+    <!--            android:textColor="@android:color/white" />-->
+
+
+    <!--    </androidx.appcompat.widget.Toolbar>-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/artists_list_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="60dp"
+        android:clipToPadding="false"
+        android:paddingBottom="350dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.47"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.067" />
+
+    <!--    <Button-->
+    <!--        android:id="@+id/btn_search"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="@string/btn_search"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintHorizontal_bias="0.329"-->
+    <!--        app:layout_constraintStart_toEndOf="@+id/txte_sa_search"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/toolbar"-->
+    <!--        app:layout_constraintVertical_bias="0.033" />-->
+
+    <!--    <EditText-->
+    <!--        android:id="@+id/txte_sa_search"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:ems="10"-->
+    <!--        android:importantForAutofill="no"-->
+    <!--        android:inputType="text"-->
+    <!--        android:minHeight="48dp"-->
+    <!--        android:text=""-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintHorizontal_bias="0.099"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/toolbar"-->
+    <!--        app:layout_constraintVertical_bias="0.033" />-->
+
+    <!--    <RadioButton-->
+    <!--        android:id="@+id/rbtn_sa_users"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="@string/rbtn_sa_users"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintHorizontal_bias="0.126"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/txte_sa_search"-->
+    <!--        app:layout_constraintVertical_bias="0.074" />-->
+
+    <!--    <RadioButton-->
+    <!--        android:id="@+id/rbtn_sa_bands"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="@string/rbtn_sa_bands"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintHorizontal_bias="0.559"-->
+    <!--        app:layout_constraintStart_toEndOf="@+id/rbtn_sa_users"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/btn_search"-->
+    <!--        app:layout_constraintVertical_bias="0.074" />-->
+    <!--    -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
