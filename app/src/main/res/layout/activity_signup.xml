@@ -50,6 +50,18 @@
             android:layout_marginBottom="16dp" />
 
         <EditText
+            android:id="@+id/et_email"
+            android:layout_width="match_parent"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"
+            android:textColorHint="@color/darkgray"
+            android:hint="Email"
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
             android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

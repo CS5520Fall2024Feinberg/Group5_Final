@@ -14,6 +14,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,9 +23,18 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (firebaseAuth.getCurrentUser() != null) {
+            startActivity(new Intent(this, Dashboard.class));
+            finish();
+            return;
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
@@ -61,10 +71,19 @@ public class MainActivity extends AppCompatActivity {
                             String storedPassword = userSnapshot.child("password").getValue(String.class);
                             if(storedPassword.equals(password) && storedPassword != null){
                                 Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(MainActivity.this, Dashboard.class);
-                                intent.putExtra("username", username);
-                                startActivity(intent);
-                                finish();
+
+                                    String storedEmail = userSnapshot.child("email").getValue(String.class);
+                                    firebaseAuth.signInWithEmailAndPassword(storedEmail, password)
+                                        .addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                Intent intent = new Intent(MainActivity.this, Dashboard.class);
+                                                intent.putExtra("username", username);
+                                                startActivity(intent);
+                                                finish();
+                                            } else {
+                                                Toast.makeText(MainActivity.this, "Sign-up failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                                 return;
                             }
                             else{

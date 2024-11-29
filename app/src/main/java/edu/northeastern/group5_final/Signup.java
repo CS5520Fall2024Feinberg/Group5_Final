@@ -3,6 +3,8 @@ package edu.northeastern.group5_final;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,6 +20,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,10 +34,11 @@ import java.util.Map;
 
 public class Signup extends AppCompatActivity {
 
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     private static final int PICK_IMAGE_REQUEST = 1;
 
     ImageView ivProfilePicture;
-    EditText etxtName, etxtUsername, etxtPassword, etxtRePassword;
+    EditText etxtName, etxtUsername, etxtEmail, etxtPassword, etxtRePassword;
     Uri profilePictureUri;
     FirebaseDatabase database;
     DatabaseReference artistsRef;
@@ -50,6 +54,7 @@ public class Signup extends AppCompatActivity {
 
         etxtName = findViewById(R.id.et_name);
         etxtUsername = findViewById(R.id.et_username);
+        etxtEmail = findViewById(R.id.et_email);
         etxtPassword = findViewById(R.id.et_password);
         etxtRePassword = findViewById(R.id.et_reenter_password);
 
@@ -90,9 +95,14 @@ public class Signup extends AppCompatActivity {
         String username = etxtUsername.getText().toString().trim();
         String password = etxtPassword.getText().toString().trim();
         String passwordRe = etxtRePassword.getText().toString().trim();
+        String email = etxtEmail.getText().toString().trim();
 
-        if (name.isEmpty() || username.isEmpty() || password.isEmpty()) {
+        if (email.isEmpty() || name.isEmpty() || username.isEmpty() || password.isEmpty()) {
             Toast.makeText(Signup.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!isValidEmail(email)) {
+            Toast.makeText(Signup.this, "Invalid email format", Toast.LENGTH_SHORT).show();
             return;
         }
         if (!password.equals(passwordRe)) {
@@ -118,7 +128,7 @@ public class Signup extends AppCompatActivity {
                                 .addOnSuccessListener(taskSnapshot -> {
                                     storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
                                         String profilePictureUrl = uri.toString();
-                                        saveUserData(name, username, password, profilePictureUrl);
+                                        saveUserData(name, username, email, password, profilePictureUrl);
                                     }).addOnFailureListener(e -> {
                                         Toast.makeText(Signup.this, "Failed to get profile picture URL", Toast.LENGTH_SHORT).show();
                                     });
@@ -129,7 +139,7 @@ public class Signup extends AppCompatActivity {
 
 
                     } else {
-                        saveUserData(name, username, password, null);
+                        saveUserData(name, username, email, password, null);
                     }
                 }
             }
@@ -139,24 +149,44 @@ public class Signup extends AppCompatActivity {
         });
     }
 
-    private void saveUserData(String name, String username, String password, @Nullable String profilePictureUrl) {
+    private void saveUserData(String name, String username, String email, String password, @Nullable String profilePictureUrl) {
         Map<String,String> userData = new HashMap<>();
         userData.put("name", name);
         userData.put("username", username);
+        userData.put("email", email);
         userData.put("password", password);
 
         if (profilePictureUrl != null) {
             userData.put("profilePictureUrl", profilePictureUrl);
         }
 
-        artistsRef.push().setValue(userData).addOnSuccessListener(unused -> {
-            Toast.makeText(Signup.this, "Signup successful", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(Signup.this, Dashboard.class);
-            intent.putExtra("username", username);
-            startActivity(intent);
-            finish();
-        }).addOnFailureListener(e -> {
-            Toast.makeText(Signup.this, "Signup failed", Toast.LENGTH_SHORT).show();
-        });
+        firebaseAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+
+                        artistsRef.push().setValue(userData).addOnSuccessListener(unused -> {
+
+                            Toast.makeText(Signup.this, "Signup successful", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(Signup.this, Dashboard.class);
+                            intent.putExtra("username", username);
+                            startActivity(intent);
+                            finish();
+
+                        }).addOnFailureListener(e -> {
+                            Toast.makeText(Signup.this, "Signup failed", Toast.LENGTH_SHORT).show();
+                        });
+
+                    } else {
+                        Toast.makeText(Signup.this, "Sign-up failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+
+
+    }
+
+    private boolean isValidEmail(String email) {
+        return (!TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches());
     }
 }
