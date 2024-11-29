@@ -29,6 +29,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -155,6 +157,8 @@ public class Signup extends AppCompatActivity {
         userData.put("username", username);
         userData.put("email", email);
         userData.put("password", password);
+        userData.put("dateJoined", getCurrentDate());
+        userData.put("bio", "");
 
         if (profilePictureUrl != null) {
             userData.put("profilePictureUrl", profilePictureUrl);
@@ -188,5 +192,11 @@ public class Signup extends AppCompatActivity {
 
     private boolean isValidEmail(String email) {
         return (!TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches());
+    }
+
+    private String getCurrentDate() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM yyyy");
+        return currentDate.format(formatter);
     }
 }

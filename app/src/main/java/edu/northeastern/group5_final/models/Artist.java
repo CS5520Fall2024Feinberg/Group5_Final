@@ -14,18 +14,16 @@ public class Artist {
     private String joinedDate;
     private List<String> songNames;
     private Uri profilePicture; // Can be null if no picture is provided
-    private int totalSongsReleased;
     private Status status;
     private String bio;
     private String username;
     private boolean isIndividual;
 
-    public Artist(String name, String joinedDate, List<String> songNames, Uri profilePicture, int totalSongsReleased, String username, String bio, boolean isInvidual) {
+    public Artist(String name, String joinedDate, List<String> songNames, Uri profilePicture, String username, String bio, boolean isInvidual) {
         this.name = name;
         this.joinedDate = joinedDate;
         this.songNames = songNames;
         this.profilePicture = profilePicture;
-        this.totalSongsReleased = totalSongsReleased;
         this.status = Status.PLUS;
         this.username = username;
         this.bio = bio;
@@ -49,7 +47,7 @@ public class Artist {
     }
 
     public int getTotalSongsReleased() {
-        return totalSongsReleased;
+        return songNames != null ? songNames.size() : 0;
     }
 
     public Status getStatus() {

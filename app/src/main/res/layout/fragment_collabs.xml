@@ -59,6 +59,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.067" />
 
+    <TextView
+        android:id="@+id/tv_empty_msg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Wow so empty!"
+        android:textColor="@color/colorGray"
+        android:padding="100dp"
+        android:visibility="gone"
+    />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <!-- Toolbar -->
