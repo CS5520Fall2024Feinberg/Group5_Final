@@ -36,6 +36,7 @@ import edu.northeastern.group5_final.adapters.RequestAdapter;
 import edu.northeastern.group5_final.models.Artist;
 import edu.northeastern.group5_final.models.ArtistDBModel;
 import edu.northeastern.group5_final.models.Request;
+import edu.northeastern.group5_final.models.RequestDBModel;
 import edu.northeastern.group5_final.models.Song;
 
 public class CollabFragment extends Fragment {
@@ -63,6 +64,7 @@ public class CollabFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         populateArtists();
+        populateRequests();
 
         emptyMsg = view.findViewById(R.id.tv_empty_msg);
 
@@ -72,7 +74,7 @@ public class CollabFragment extends Fragment {
 
         requestsRecyclerView = view.findViewById(R.id.request_list_recycler_view);
         requestsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        requestsRecyclerView.setVisibility(View.GONE);
+        initializeRequestAdapter();
 
         toggleBtn = view.findViewById(R.id.toggle_btn);
         toggleBtn.setOnClickListener(v -> {
@@ -89,14 +91,16 @@ public class CollabFragment extends Fragment {
         });
     }
 
-    private void initializeRequestAdapter() {
-        requestAdapter = new RequestAdapter(requireContext(), requestList);
-        requestsRecyclerView.setAdapter(requestAdapter);
-    }
-
     private void initializeArtistsAdapter() {
         artistAdapter = new ArtistAdapter(requireContext(), artistList, localStatusMap);
         artistsRecyclerView.setAdapter(artistAdapter);
+//        checkIfListIsEmpty(true);
+    }
+
+    private void initializeRequestAdapter() {
+        requestAdapter = new RequestAdapter(requireContext(), requestList);
+        requestsRecyclerView.setAdapter(requestAdapter);
+//        checkIfListIsEmpty(false);
     }
 
     private void populateArtists() {
@@ -124,7 +128,6 @@ public class CollabFragment extends Fragment {
                     Log.e("Error", "Self user data could not be retrieved");
                     return;
                 }
-
 
                 Map<String, String> sentRequests = new HashMap<>();
                 if (snapshot.getChildrenCount() > 0) {
@@ -154,7 +157,7 @@ public class CollabFragment extends Fragment {
                                 else if (a.getUsername() != null && sentRequests.containsKey(a.getUsername())) {
                                     status = Artist.Status.valueOf(sentRequests.get(a.getUsername()));
                                 }
-                                
+
                                 artistList.add(new Artist(
                                         a.getName(),
                                         a.getDateJoined(),
@@ -168,7 +171,6 @@ public class CollabFragment extends Fragment {
                             }
                         }
                         artistAdapter.notifyDataSetChanged();
-                        populateRequests();
                     }
 
                     @Override
@@ -185,11 +187,97 @@ public class CollabFragment extends Fragment {
         });
     }
 
-
     private void populateRequests() {
         requestList = new ArrayList<>();
-        requestList.add(new Request(artistList.get(0), artistList.get(0).getUsername(), "Hey! Let's form a band.", "The Rockers", artistList.get(0).getProfilePicture()));
-        requestList.add(new Request(artistList.get(1), artistList.get(1).getUsername(), "Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating.", "Sufi Stars", artistList.get(1).getProfilePicture()));
-        initializeRequestAdapter();
+
+        DatabaseReference requestsRef = FirebaseDatabase.getInstance().getReference("requests");
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+
+        requestsRef.orderByChild("recipientUsername").equalTo(currentUsername)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        requestList.clear();
+
+                        for (DataSnapshot requestSnapshot : snapshot.getChildren()) {
+                            RequestDBModel requestDB = requestSnapshot.getValue(RequestDBModel.class);
+                            if (requestDB != null) {
+
+                                String requestorUsername = requestDB.getRequestorUsername();
+                                DatabaseReference artistsRef = FirebaseDatabase.getInstance().getReference("artists");
+                                artistsRef.orderByChild("username").equalTo(requestorUsername)
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot artistSnapshot) {
+                                                if (artistSnapshot.exists()) {
+                                                    for (DataSnapshot artistData : artistSnapshot.getChildren()) {
+                                                        ArtistDBModel artistDB = artistData.getValue(ArtistDBModel.class);
+                                                        if (artistDB != null) {
+                                                            Artist requestor = new Artist(
+                                                                    artistDB.getName(),
+                                                                    artistDB.getDateJoined(),
+                                                                    Arrays.asList("Song A", "Song B"),
+                                                                    artistDB.getProfilePictureUrl() == null ? null : Uri.parse(artistDB.getProfilePictureUrl()),
+                                                                    Artist.Status.WAITING,
+                                                                    artistDB.getUsername(),
+                                                                    artistDB.getBio(),
+                                                                    true
+                                                            );
+
+                                                            requestList.add(new Request(
+                                                                    requestor,
+                                                                    requestor.getUsername(),
+                                                                    requestDB.getSubject(),
+                                                                    requestDB.getMessage(),
+                                                                    requestDB.getBandName(),
+                                                                    requestor.getProfilePicture()
+                                                            ));
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Log.e("FirebaseError", "Error fetching artist data: " + error.getMessage());
+                                            }
+                                        });
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("FirebaseError", "Failed to fetch requests: " + error.getMessage());
+                    }
+                });
+    }
+
+    private void checkIfListIsEmpty(boolean checkForArtist) {
+        if (checkForArtist) {
+            if (artistsRecyclerView.getVisibility() == View.VISIBLE) {
+                if (artistList.isEmpty()) {
+                    artistsRecyclerView.setVisibility(View.GONE);
+                    emptyMsg.setVisibility(View.VISIBLE);
+                } else {
+                    artistsRecyclerView.setVisibility(View.VISIBLE);
+                    emptyMsg.setVisibility(View.GONE);
+                }
+            }
+            return;
+        }
+
+        if (requestsRecyclerView.getVisibility() == View.VISIBLE) {
+            if (requestList.isEmpty()) {
+                requestsRecyclerView.setVisibility(View.GONE);
+                emptyMsg.setVisibility(View.VISIBLE);
+            } else {
+                requestsRecyclerView.setVisibility(View.VISIBLE);
+                emptyMsg.setVisibility(View.GONE);
+            }
+        }
+
     }
 }
+
+

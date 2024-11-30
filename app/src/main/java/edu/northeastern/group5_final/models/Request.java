@@ -3,25 +3,30 @@ package edu.northeastern.group5_final.models;
 import android.net.Uri;
 
 public class Request {
-    private Artist requestee;
-    private String requesteeUsername;
+    private Artist requestor;
+    private String requestorUsername;
+    private String subject;
     private String message;
     private String suggestedBandName;
     private Uri profilePicture;
-
-    public Request(Artist requestee, String requesteeUsername, String message, String suggestedBandName, Uri profilePicture) {
-        this.requestee = requestee;
-        this.requesteeUsername = requesteeUsername;
+    
+    public Request(Artist requestor, String requestorUsername, String subject, String message, String suggestedBandName, Uri profilePicture) {
+        this.requestor = requestor;
+        this.requestorUsername = requestorUsername;
+        this.subject = subject;
         this.message = message;
         this.suggestedBandName = suggestedBandName;
         this.profilePicture = profilePicture;
     }
 
-    public Artist getRequestee() { return requestee; }
-    public void setRequestee(Artist requestee) { this.requestee = requestee; }
+    public Artist getRequestor() { return requestor; }
+    public void setRequestor(Artist requestor) { this.requestor = requestor; }
 
-    public String getRequesteeUsername() { return requesteeUsername; }
-    public void setRequesteeUsername(String requesteeUsername) { this.requesteeUsername = requesteeUsername; }
+    public String getRequestorUsername() { return requestorUsername; }
+    public void setRequestorUsername(String requestorUsername) {this.requestorUsername = requestorUsername; }
+
+    public String getSubject() { return subject; }
+    public void setSubject(String subject) { this.subject = subject; }
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }

@@ -42,10 +42,10 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         if (request.getProfilePicture() != null) {
             holder.requesteePicture.setImageURI(request.getProfilePicture());
         } else {
-            holder.requesteePicture.setImageResource(request.getRequestee().getIsIndividual() ?  R.drawable.single_artist_icon : R.drawable.artists_group_icon);
+            holder.requesteePicture.setImageResource(request.getRequestor().getIsIndividual() ?  R.drawable.single_artist_icon : R.drawable.artists_group_icon);
         }
 
-        holder.requesteeUsername.setText(request.getRequesteeUsername());
+        holder.requesteeUsername.setText(request.getRequestorUsername());
         holder.suggestedBandName.setText("Suggested Band: " + request.getSuggestedBandName());
         holder.requestMessage.setText(request.getMessage());
 
@@ -59,7 +59,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
             notifyItemRemoved(position);
         });
 
-        Artist artist = request.getRequestee();
+        Artist artist = request.getRequestor();
         View.OnClickListener profileClickListener = v -> showArtistProfileDialog(artist);
         holder.requesteePicture.setOnClickListener(profileClickListener);
         holder.requesteeUsername.setOnClickListener(profileClickListener);
