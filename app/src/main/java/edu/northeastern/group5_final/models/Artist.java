@@ -19,12 +19,12 @@ public class Artist {
     private String username;
     private boolean isIndividual;
 
-    public Artist(String name, String joinedDate, List<String> songNames, Uri profilePicture, String username, String bio, boolean isInvidual) {
+    public Artist(String name, String joinedDate, List<String> songNames, Uri profilePicture, Status status, String username, String bio, boolean isInvidual) {
         this.name = name;
         this.joinedDate = joinedDate;
         this.songNames = songNames;
         this.profilePicture = profilePicture;
-        this.status = Status.PLUS;
+        this.status = status;
         this.username = username;
         this.bio = bio;
         this.isIndividual = isInvidual;

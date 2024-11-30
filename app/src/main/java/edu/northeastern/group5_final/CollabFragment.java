@@ -1,6 +1,7 @@
 package edu.northeastern.group5_final;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,7 +27,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.northeastern.group5_final.adapters.ArtistAdapter;
 import edu.northeastern.group5_final.adapters.RequestAdapter;
@@ -44,6 +49,8 @@ public class CollabFragment extends Fragment {
     RecyclerView requestsRecyclerView;
     ArtistAdapter artistAdapter;
     RequestAdapter requestAdapter;
+
+    private ArtistDBModel selfUser;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -93,33 +100,83 @@ public class CollabFragment extends Fragment {
 
     private void populateArtists() {
         artistList = new ArrayList<>();
-        DatabaseReference artistsRef = FirebaseDatabase.getInstance().getReference("artists");
 
-        artistsRef.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("NotifyDataSetChanged")
+        DatabaseReference artistsRef = FirebaseDatabase.getInstance().getReference("artists");
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        String currentUserEmail = firebaseAuth.getCurrentUser().getEmail();
+
+        artistsRef.orderByChild("email").equalTo(currentUserEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                artistList.clear();
-                for (DataSnapshot artistSnapshot : snapshot.getChildren()) {
-                    ArtistDBModel a = artistSnapshot.getValue(ArtistDBModel.class);
-                    if (a != null) {
-                        artistList.add(new Artist(
-                                a.getName(),
-                                a.getDateJoined(),
-                                Arrays.asList("Song A", "Song B"),
-                                a.getProfilePictureUrl() == null ? null : Uri.parse(a.getProfilePictureUrl()),
-                                a.getUsername(),
-                                a.getBio(),
-                                true
-                        ));
+                if (!snapshot.exists()) {
+                    Log.e("Error", "Self user not found in artists");
+                    return;
+                }
+
+                selfUser = null;
+                for (DataSnapshot selfSnapshot : snapshot.getChildren()) {
+                    selfUser = selfSnapshot.getValue(ArtistDBModel.class);
+                    if (selfUser != null) break;
+                }
+
+                if (selfUser == null) {
+                    Log.e("Error", "Self user data could not be retrieved");
+                    return;
+                }
+
+
+                Map<String, String> sentRequests = new HashMap<>();
+                if (snapshot.getChildrenCount() > 0) {
+                    for (DataSnapshot selfSnapshot : snapshot.getChildren()) {
+                        if (selfSnapshot.hasChild("requestsSent")) {
+                            for (DataSnapshot requestSnapshot : selfSnapshot.child("requestsSent").getChildren()) {
+                                sentRequests.put(requestSnapshot.getKey(), requestSnapshot.getValue(String.class));
+                            }
+                        }
                     }
                 }
-                artistAdapter.notifyDataSetChanged();
-                populateRequests();
+
+                artistsRef.addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        artistList.clear();
+
+                        for (DataSnapshot artistSnapshot : snapshot.getChildren()) {
+                            ArtistDBModel a = artistSnapshot.getValue(ArtistDBModel.class);
+                            if (a != null && !a.getUsername().equals(selfUser.getUsername())) {
+
+                                Artist.Status status = Artist.Status.PLUS;
+                                if (a.getUsername() != null && sentRequests.containsKey(a.getUsername())) {
+                                    status = Artist.Status.valueOf(sentRequests.get(a.getUsername()));
+                                }
+
+                                artistList.add(new Artist(
+                                        a.getName(),
+                                        a.getDateJoined(),
+                                        Arrays.asList("Song A", "Song B"),
+                                        a.getProfilePictureUrl() == null ? null : Uri.parse(a.getProfilePictureUrl()),
+                                        status,
+                                        a.getUsername(),
+                                        a.getBio(),
+                                        true
+                                ));
+                            }
+                        }
+                        artistAdapter.notifyDataSetChanged();
+                        populateRequests();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("FirebaseError", "Error fetching artists: " + error.getMessage());
+                    }
+                });
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("FirebaseError", "Error loading artists: " + error.getMessage());
+                Log.e("FirebaseError", "Error fetching self user: " + error.getMessage());
             }
         });
     }

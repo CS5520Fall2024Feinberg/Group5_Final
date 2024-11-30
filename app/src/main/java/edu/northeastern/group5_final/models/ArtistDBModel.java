@@ -4,7 +4,8 @@ import android.net.Uri;
 
 import com.google.firebase.database.Exclude;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArtistDBModel {
 
@@ -13,6 +14,9 @@ public class ArtistDBModel {
     private String dateJoined;
     private String profilePictureUrl;
     private String bio;
+
+    @Exclude
+    private Map<String,String> requestsSent = new HashMap<>();
 
     @Exclude
     private String password;
@@ -66,5 +70,13 @@ public class ArtistDBModel {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public Map<String, String> getRequestsSent() {
+        return requestsSent;
+    }
+
+    public void setRequestsSent(Map<String, String> requestsSent) {
+        this.requestsSent = requestsSent;
     }
 }
