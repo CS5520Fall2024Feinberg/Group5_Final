@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        FirebaseDatabase.getInstance().setPersistenceEnabled(false);
         if (firebaseAuth.getCurrentUser() != null) {
             startActivity(new Intent(this, Dashboard.class));
             finish();

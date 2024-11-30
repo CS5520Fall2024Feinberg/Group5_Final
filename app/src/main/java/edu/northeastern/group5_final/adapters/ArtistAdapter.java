@@ -3,6 +3,7 @@ package edu.northeastern.group5_final.adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.northeastern.group5_final.R;
 import edu.northeastern.group5_final.models.Artist;
@@ -26,10 +37,16 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
 
     private final Context context;
     private final List<Artist> artistList;
+    private final Map<String, Artist.Status> localStatusMap;
 
-    public ArtistAdapter(Context context, List<Artist> artistList) {
+    public ArtistAdapter(Context context, List<Artist> artistList, Map<String, Artist.Status> localStatusMap) {
         this.context = context;
         this.artistList = artistList;
+        this.localStatusMap = localStatusMap;
+    }
+
+    private void updateStatus(String username, Artist.Status status) {
+        localStatusMap.put(username, status);
     }
 
     @NonNull
@@ -65,7 +82,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
                 break;
         }
 
-
         holder.sendRequestButton.setOnClickListener(v -> {
             if (artist.getStatus() == Artist.Status.PLUS) {
                 showRequestDialog(artist, position);
@@ -75,8 +91,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
         View.OnClickListener profileClickListener = v -> showArtistProfileDialog(artist);
         holder.artistPicture.setOnClickListener(profileClickListener);
         holder.artistName.setOnClickListener(profileClickListener);
-
-
     }
 
     @Override
@@ -115,22 +129,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
             String content = etContent.getText().toString().trim();
 
             if (!bandName.isEmpty() && !subject.isEmpty() && !content.isEmpty()) {
-                artist.setStatus(Artist.Status.WAITING);
-                notifyItemChanged(position);
+                addRequestToFirebase(artist, bandName, subject, content, position);
                 Toast.makeText(context, "Request Sent:\nBand: " + bandName + "\nSubject: " + subject, Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
-
-                // TODO Remove this later
-                new android.os.Handler().postDelayed(() -> {
-                    boolean isAccepted = Math.random() > 0.1;
-                    if (isAccepted) {
-                        artist.setStatus(Artist.Status.DONE);
-                    } else {
-                        artist.setStatus(Artist.Status.PLUS);
-                    }
-                    notifyItemChanged(position);
-                }, 1000);
-
 
             } else {
                 Toast.makeText(context, "Please fill in all fields!", Toast.LENGTH_SHORT).show();
@@ -139,6 +140,56 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
 
         btnDismiss.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
+    }
+
+    private void addRequestToFirebase(Artist artist, String bandName, String subject, String content, int position) {
+        DatabaseReference requestsRef = FirebaseDatabase.getInstance().getReference("requests");
+        DatabaseReference artistRef = FirebaseDatabase.getInstance().getReference("artists");
+        String requestorUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        String recipientUsername = artist.getUsername();
+        String requestId = requestsRef.push().getKey();
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("requestorUsername", requestorUsername);
+        request.put("recipientUsername", recipientUsername);
+        request.put("status", "WAITING");
+        request.put("bandName", bandName);
+        request.put("subject", subject);
+        request.put("message", content);
+        request.put("timestamp", ServerValue.TIMESTAMP);
+
+        requestsRef.child(requestId).setValue(request)
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(context, "Request sent successfully", Toast.LENGTH_SHORT).show();
+                    updateStatus(recipientUsername, Artist.Status.WAITING);
+
+                    artistRef.orderByChild("username").equalTo(requestorUsername)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if (snapshot.exists()) {
+                                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                                            userSnapshot.getRef()
+                                                    .child("requestsSent")
+                                                    .child(recipientUsername)
+                                                    .setValue("WAITING");
+                                            break;
+                                        }
+                                    } else {
+                                        Log.e("FirebaseError", "User not found for username: " + requestorUsername);
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    Log.e("FirebaseError", "Error finding user by username: " + error.getMessage());
+                                }
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(context, "Failed to send request: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    artist.setStatus(Artist.Status.PLUS);
+                    notifyItemChanged(position);
+                });
     }
 
 

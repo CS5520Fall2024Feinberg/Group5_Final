@@ -14,8 +14,6 @@ public class ArtistDBModel {
     private String dateJoined;
     private String profilePictureUrl;
     private String bio;
-
-    @Exclude
     private Map<String,String> requestsSent = new HashMap<>();
 
     @Exclude

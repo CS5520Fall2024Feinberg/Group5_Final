@@ -51,6 +51,7 @@ public class CollabFragment extends Fragment {
     RequestAdapter requestAdapter;
 
     private ArtistDBModel selfUser;
+    private final Map<String, Artist.Status> localStatusMap = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -94,7 +95,7 @@ public class CollabFragment extends Fragment {
     }
 
     private void initializeArtistsAdapter() {
-        artistAdapter = new ArtistAdapter(requireContext(), artistList);
+        artistAdapter = new ArtistAdapter(requireContext(), artistList, localStatusMap);
         artistsRecyclerView.setAdapter(artistAdapter);
     }
 
@@ -147,10 +148,13 @@ public class CollabFragment extends Fragment {
                             if (a != null && !a.getUsername().equals(selfUser.getUsername())) {
 
                                 Artist.Status status = Artist.Status.PLUS;
-                                if (a.getUsername() != null && sentRequests.containsKey(a.getUsername())) {
+                                if (a.getUsername() != null && localStatusMap.containsKey(a.getUsername())) {
+                                    status = localStatusMap.get(a.getUsername());
+                                }
+                                else if (a.getUsername() != null && sentRequests.containsKey(a.getUsername())) {
                                     status = Artist.Status.valueOf(sentRequests.get(a.getUsername()));
                                 }
-
+                                
                                 artistList.add(new Artist(
                                         a.getName(),
                                         a.getDateJoined(),
@@ -186,8 +190,6 @@ public class CollabFragment extends Fragment {
         requestList = new ArrayList<>();
         requestList.add(new Request(artistList.get(0), artistList.get(0).getUsername(), "Hey! Let's form a band.", "The Rockers", artistList.get(0).getProfilePicture()));
         requestList.add(new Request(artistList.get(1), artistList.get(1).getUsername(), "Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating. Looking forward to collaborating.", "Sufi Stars", artistList.get(1).getProfilePicture()));
-        requestList.add(new Request(artistList.get(2), artistList.get(2).getUsername(), "Would love to jam together!", "Country Vibes", artistList.get(2).getProfilePicture()));
-
         initializeRequestAdapter();
     }
 }
