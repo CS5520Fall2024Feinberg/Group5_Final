@@ -87,7 +87,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         String requestorUsername = requestor.getUsername();
 
         requestsRef.orderByChild("recipientUsername").equalTo(currentUsername)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot requestSnapshot : snapshot.getChildren()) {
@@ -104,6 +104,27 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
                                                                 for (DataSnapshot artist : artistSnapshot.getChildren()) {
                                                                     artist.getRef().child("requestsSent")
                                                                             .child(currentUsername)
+                                                                            .setValue("DONE");
+                                                                }
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError error) {
+                                                            Log.e("FirebaseError", "Error updating requestsSent: " + error.getMessage());
+                                                        }
+                                                    });
+                                            Toast.makeText(context, "Request accepted successfully", Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnSuccessListener(unused -> {
+                                            artistsRef.orderByChild("username").equalTo(currentUsername)
+                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot artistSnapshot) {
+                                                            if (artistSnapshot.exists()) {
+                                                                for (DataSnapshot artist : artistSnapshot.getChildren()) {
+                                                                    artist.getRef().child("requestsSent")
+                                                                            .child(requestorUsername)
                                                                             .setValue("DONE");
                                                                 }
                                                             }

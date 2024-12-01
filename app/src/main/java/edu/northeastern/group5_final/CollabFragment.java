@@ -201,7 +201,7 @@ public class CollabFragment extends Fragment {
 
                         for (DataSnapshot requestSnapshot : snapshot.getChildren()) {
                             RequestDBModel requestDB = requestSnapshot.getValue(RequestDBModel.class);
-                            if (requestDB != null) {
+                            if (requestDB != null && !requestDB.getStatus().equals("DONE")) {
 
                                 String requestorUsername = requestDB.getRequestorUsername();
                                 DatabaseReference artistsRef = FirebaseDatabase.getInstance().getReference("artists");
