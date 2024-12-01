@@ -3,29 +3,44 @@ package edu.northeastern.group5_final.adapters;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.List;
 
+import edu.northeastern.group5_final.CollabFragment;
 import edu.northeastern.group5_final.R;
 import edu.northeastern.group5_final.models.Artist;
 import edu.northeastern.group5_final.models.Request;
+import edu.northeastern.group5_final.models.RequestDBModel;
 
 public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestViewHolder> {
 
     private final Context context;
-    private final List<Request> requestList;
+    private List<Request> requestList;
+    private CollabFragment collabFragment;
 
-    public RequestAdapter(Context context, List<Request> requestList) {
+    public RequestAdapter(Context context, List<Request> requestList, CollabFragment collabFragment) {
         this.context = context;
         this.requestList = requestList;
+        this.collabFragment = collabFragment;
     }
 
     @NonNull
@@ -38,6 +53,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
     @Override
     public void onBindViewHolder(@NonNull RequestViewHolder holder, int position) {
         Request request = requestList.get(position);
+        Artist artist = request.getRequestor();
 
         if (request.getProfilePicture() != null) {
             holder.requesteePicture.setImageURI(request.getProfilePicture());
@@ -49,22 +65,128 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
         holder.suggestedBandName.setText("Suggested Band: " + request.getSuggestedBandName());
         holder.requestMessage.setText(request.getMessage());
 
-        holder.acceptRequestButton.setOnClickListener(v -> {
-            requestList.remove(position);
-            notifyItemRemoved(position);
-        });
+        holder.acceptRequestButton.setOnClickListener(v -> acceptListener(artist, position));
+        holder.rejectRequestButton.setOnClickListener(v -> rejectListener(artist, position));
 
-        holder.rejectRequestButton.setOnClickListener(v -> {
-            requestList.remove(position);
-            notifyItemRemoved(position);
-        });
-
-        Artist artist = request.getRequestor();
         View.OnClickListener profileClickListener = v -> showArtistProfileDialog(artist);
         holder.requesteePicture.setOnClickListener(profileClickListener);
         holder.requesteeUsername.setOnClickListener(profileClickListener);
 
     }
+
+    private void acceptListener(Artist requestor, int position) {
+
+        if (position < requestList.size()) {
+            requestList.remove(position);
+            notifyItemRemoved(position);
+        }
+
+        DatabaseReference requestsRef = FirebaseDatabase.getInstance().getReference("requests");
+        DatabaseReference artistsRef = FirebaseDatabase.getInstance().getReference("artists");
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        String requestorUsername = requestor.getUsername();
+
+        requestsRef.orderByChild("recipientUsername").equalTo(currentUsername)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot requestSnapshot : snapshot.getChildren()) {
+                            RequestDBModel request = requestSnapshot.getValue(RequestDBModel.class);
+
+                            if (request != null && request.getRequestorUsername().equals(requestorUsername)) {
+                                requestSnapshot.getRef().child("status").setValue("DONE")
+                                        .addOnSuccessListener(unused -> {
+                                            artistsRef.orderByChild("username").equalTo(requestorUsername)
+                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot artistSnapshot) {
+                                                            if (artistSnapshot.exists()) {
+                                                                for (DataSnapshot artist : artistSnapshot.getChildren()) {
+                                                                    artist.getRef().child("requestsSent")
+                                                                            .child(currentUsername)
+                                                                            .setValue("DONE");
+                                                                }
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError error) {
+                                                            Log.e("FirebaseError", "Error updating requestsSent: " + error.getMessage());
+                                                        }
+                                                    });
+                                            Toast.makeText(context, "Request accepted successfully", Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("FirebaseError", "Failed to update request status: " + e.getMessage());
+                                            Toast.makeText(context, "Failed to accept request", Toast.LENGTH_SHORT).show();
+                                        });
+                                break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("FirebaseError", "Error finding request: " + error.getMessage());
+                    }
+                });
+    }
+
+    private void rejectListener(Artist requestor, int position) {
+        requestList.remove(position);
+        notifyItemRemoved(position);
+
+        DatabaseReference requestsRef = FirebaseDatabase.getInstance().getReference("requests");
+        DatabaseReference artistsRef = FirebaseDatabase.getInstance().getReference("artists");
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        String requestorUsername = requestor.getUsername();
+
+        requestsRef.orderByChild("recipientUsername").equalTo(currentUsername)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot requestSnapshot : snapshot.getChildren()) {
+                            RequestDBModel request = requestSnapshot.getValue(RequestDBModel.class);
+
+                            if (request != null && request.getRequestorUsername().equals(requestorUsername)) {
+                                requestSnapshot.getRef().removeValue()
+                                        .addOnSuccessListener(unused -> {
+                                            artistsRef.orderByChild("username").equalTo(requestorUsername)
+                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot artistSnapshot) {
+                                                            if (artistSnapshot.exists()) {
+                                                                for (DataSnapshot artist : artistSnapshot.getChildren()) {
+                                                                    artist.getRef().child("requestsSent")
+                                                                            .child(currentUsername)
+                                                                            .removeValue();
+                                                                }
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError error) {
+                                                            Log.e("FirebaseError", "Error removing from requestsSent: " + error.getMessage());
+                                                        }
+                                                    });
+                                            Toast.makeText(context, "Request rejected successfully", Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("FirebaseError", "Failed to delete request: " + e.getMessage());
+                                            Toast.makeText(context, "Failed to reject request", Toast.LENGTH_SHORT).show();
+                                        });
+                                break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("FirebaseError", "Error finding request: " + error.getMessage());
+                    }
+                });
+    }
+
 
     @Override
     public int getItemCount() {
@@ -114,4 +236,10 @@ public class RequestAdapter extends RecyclerView.Adapter<RequestAdapter.RequestV
 
         dialog.show();
     }
+
+    public void updateList(List<Request> newRequestList) {
+        this.requestList = newRequestList;
+        notifyDataSetChanged();
+    }
+
 }
