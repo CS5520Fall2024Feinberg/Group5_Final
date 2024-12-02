@@ -52,7 +52,7 @@ public class CollabFragment extends Fragment {
     RequestAdapter requestAdapter;
 
     private ArtistDBModel selfUser;
-    private final Map<String, Artist.Status> localStatusMap = new HashMap<>();
+    public final Map<String, Artist.Status> localStatusMap = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -94,13 +94,13 @@ public class CollabFragment extends Fragment {
     private void initializeArtistsAdapter() {
         artistAdapter = new ArtistAdapter(requireContext(), artistList, localStatusMap);
         artistsRecyclerView.setAdapter(artistAdapter);
-//        checkIfListIsEmpty(true);
+        // checkIfListIsEmpty(true);
     }
 
     private void initializeRequestAdapter() {
-        requestAdapter = new RequestAdapter(requireContext(), requestList);
+        requestAdapter = new RequestAdapter(requireContext(), requestList, this);
         requestsRecyclerView.setAdapter(requestAdapter);
-//        checkIfListIsEmpty(false);
+        // checkIfListIsEmpty(false);
     }
 
     private void populateArtists() {
@@ -110,7 +110,7 @@ public class CollabFragment extends Fragment {
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         String currentUserEmail = firebaseAuth.getCurrentUser().getEmail();
 
-        artistsRef.orderByChild("email").equalTo(currentUserEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+        artistsRef.orderByChild("email").equalTo(currentUserEmail).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
@@ -151,13 +151,12 @@ public class CollabFragment extends Fragment {
                             if (a != null && !a.getUsername().equals(selfUser.getUsername())) {
 
                                 Artist.Status status = Artist.Status.PLUS;
-                                if (a.getUsername() != null && localStatusMap.containsKey(a.getUsername())) {
-                                    status = localStatusMap.get(a.getUsername());
-                                }
-                                else if (a.getUsername() != null && sentRequests.containsKey(a.getUsername())) {
+//                                if (a.getUsername() != null && localStatusMap.containsKey(a.getUsername())) {
+//                                    status = localStatusMap.get(a.getUsername());
+//                                }
+                                if (a.getUsername() != null && sentRequests.containsKey(a.getUsername())) {
                                     status = Artist.Status.valueOf(sentRequests.get(a.getUsername()));
                                 }
-
                                 artistList.add(new Artist(
                                         a.getName(),
                                         a.getDateJoined(),
@@ -168,6 +167,7 @@ public class CollabFragment extends Fragment {
                                         a.getBio(),
                                         true
                                 ));
+                                artistAdapter.notifyItemInserted(artistList.size() - 1);
                             }
                         }
                         artistAdapter.notifyDataSetChanged();
@@ -194,19 +194,20 @@ public class CollabFragment extends Fragment {
         String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
 
         requestsRef.orderByChild("recipientUsername").equalTo(currentUsername)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         requestList.clear();
 
                         for (DataSnapshot requestSnapshot : snapshot.getChildren()) {
                             RequestDBModel requestDB = requestSnapshot.getValue(RequestDBModel.class);
-                            if (requestDB != null) {
+                            if (requestDB != null && !requestDB.getStatus().equals("DONE")) {
 
                                 String requestorUsername = requestDB.getRequestorUsername();
                                 DatabaseReference artistsRef = FirebaseDatabase.getInstance().getReference("artists");
                                 artistsRef.orderByChild("username").equalTo(requestorUsername)
                                         .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @SuppressLint("NotifyDataSetChanged")
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot artistSnapshot) {
                                                 if (artistSnapshot.exists()) {
@@ -236,6 +237,7 @@ public class CollabFragment extends Fragment {
                                                         }
                                                     }
                                                 }
+                                                requestAdapter.notifyDataSetChanged();
                                             }
 
                                             @Override
@@ -253,30 +255,15 @@ public class CollabFragment extends Fragment {
                 });
     }
 
-    private void checkIfListIsEmpty(boolean checkForArtist) {
-        if (checkForArtist) {
-            if (artistsRecyclerView.getVisibility() == View.VISIBLE) {
-                if (artistList.isEmpty()) {
-                    artistsRecyclerView.setVisibility(View.GONE);
-                    emptyMsg.setVisibility(View.VISIBLE);
-                } else {
-                    artistsRecyclerView.setVisibility(View.VISIBLE);
-                    emptyMsg.setVisibility(View.GONE);
-                }
-            }
-            return;
+    private void updateRequestsUI(List<Request> list) {
+        if (list.isEmpty()) {
+            emptyMsg.setVisibility(View.VISIBLE);
+            requestsRecyclerView.setVisibility(View.GONE);
+        } else {
+            emptyMsg.setVisibility(View.GONE);
+            requestsRecyclerView.setVisibility(View.VISIBLE);
+            requestAdapter.updateList(list);
         }
-
-        if (requestsRecyclerView.getVisibility() == View.VISIBLE) {
-            if (requestList.isEmpty()) {
-                requestsRecyclerView.setVisibility(View.GONE);
-                emptyMsg.setVisibility(View.VISIBLE);
-            } else {
-                requestsRecyclerView.setVisibility(View.VISIBLE);
-                emptyMsg.setVisibility(View.GONE);
-            }
-        }
-
     }
 }
 
