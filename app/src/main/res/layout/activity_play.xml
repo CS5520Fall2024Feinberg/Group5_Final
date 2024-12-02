@@ -9,8 +9,8 @@
 
     <Button
         android:id="@+id/quit_btn"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="left"
         android:background="@drawable/baseline_arrow_back_ios_24"
         android:backgroundTint="@color/white" />

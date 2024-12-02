@@ -1,12 +1,10 @@
 package edu.northeastern.group5_final;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -40,6 +38,11 @@ public class Dashboard extends AppCompatActivity {
             }
 
             return true;
+        });
+
+        findViewById(R.id.play).setOnClickListener(v -> {
+            startActivity(new Intent(Dashboard.this,
+                    PlayActivity.class));
         });
     }
 }

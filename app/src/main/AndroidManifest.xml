@@ -34,6 +34,9 @@
             android:name=".Signup"
             android:exported="false" />
         <activity
+            android:name=".PlayActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
