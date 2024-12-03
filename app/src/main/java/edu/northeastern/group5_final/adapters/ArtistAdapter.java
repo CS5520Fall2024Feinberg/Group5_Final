@@ -177,7 +177,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
         String requestorUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         String recipientUsername = artist.getUsername();
         String requestId = requestsRef.push().getKey();
-        Toast test = Toast.makeText(context, "test", Toast.LENGTH_SHORT);
 
         Map<String, Object> request = new HashMap<>();
         request.put("requestorUsername", requestorUsername);
