@@ -63,7 +63,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
     @Override
     public void onBindViewHolder(@NonNull ArtistViewHolder holder, int position) {
         Artist artist = artistList.get(position);
-        Toast.makeText(context, "This is a Toast message", Toast.LENGTH_SHORT).show();
 
         holder.artistName.setText(artist.getName());
         holder.albumsReleased.setText("Albums: " + artist.getTotalSongsReleased());
@@ -80,23 +79,29 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
          */
 
         //setting profile picture
-        String Url = "gs://cs5520-group5-final.firebasestorage.app/profile_pictures/" + artist.getUsername() + ".jpg";
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReferenceFromUrl(Url);
-
-        storageReference.getDownloadUrl()
-                .addOnSuccessListener(uri -> {
-                    Glide.with(context)
-                            .load(uri.toString())
-                            .placeholder(R.drawable.single_artist_icon)
-                            .error(R.drawable.single_artist_icon)           // Fallback image
-                            .circleCrop()                                   // Make the image circular
-                            .into(holder.artistPicture);
-                })
-                .addOnFailureListener(e -> {//cant find image
-                    holder.artistPicture.setImageResource(R.drawable.single_artist_icon); // Fallback image
-                });
-
+        //String Url = "gs://cs5520-group5-final.firebasestorage.app/profile_pictures/" + artist.getUsername() + ".jpg";
+        if (artist.getProfilePicture() != null) {
+            String Url = artist.getProfilePicture().toString();
+            //Log.e("URL", "URL of image: : " + Url2);
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReferenceFromUrl(Url);
+            storageReference.getDownloadUrl()
+                    .addOnSuccessListener(uri -> {
+                        Glide.with(context)
+                                .load(uri.toString())
+                                .placeholder(R.drawable.single_artist_icon)
+                                .error(R.drawable.single_artist_icon)           // Fallback image
+                                .circleCrop()                                   // Make the image circular
+                                .into(holder.artistPicture);
+                    })
+                    .addOnFailureListener(e -> {//cant find image
+                        holder.artistPicture.setImageResource(R.drawable.single_artist_icon); // Fallback image
+                    });
+        }
+        else {//when they dont have a profile picture
+            //Log.e("URL", "URL of image is null: " + artist.getUsername());
+            holder.artistPicture.setImageResource(R.drawable.single_artist_icon);
+        }
 
         switch (artist.getStatus()) {
             case PLUS:
@@ -144,7 +149,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
     private void showRequestDialog(Artist artist, int position) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_send_request, null);
         AlertDialog dialog = new AlertDialog.Builder(context).setView(dialogView).create();
-        Toast test = Toast.makeText(context, "test!@#$", Toast.LENGTH_SHORT);
 
         EditText etSuggestedBandName = dialogView.findViewById(R.id.et_suggested_band_name);
         EditText etSubject = dialogView.findViewById(R.id.et_subject);
@@ -235,23 +239,28 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
 
 
         //setting profile picture
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        String Url = "gs://cs5520-group5-final.firebasestorage.app/profile_pictures/" + artist.getUsername() + ".jpg";
-        StorageReference storageReference = storage.getReferenceFromUrl(Url);
-
-        storageReference.getDownloadUrl()
-                .addOnSuccessListener(uri -> {
-                    Glide.with(context)
-                            .load(uri.toString())
-                            .placeholder(R.drawable.single_artist_icon)
-                            .error(R.drawable.single_artist_icon)           // if something goes wrong
-                            .circleCrop()                                   // Make the image circular
-                            .into(dialogArtistPicture);
-                })
-                .addOnFailureListener(e -> {
-                    //cant find image
-                    dialogArtistPicture.setImageResource(R.drawable.single_artist_icon); // Fallback image
-                });
+        if (artist.getProfilePicture() != null) {
+            String Url = artist.getProfilePicture().toString();
+            //Log.e("URL", "URL of image: : " + Url2);
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReferenceFromUrl(Url);
+            storageReference.getDownloadUrl()
+                    .addOnSuccessListener(uri -> {
+                        Glide.with(context)
+                                .load(uri.toString())
+                                .placeholder(R.drawable.single_artist_icon)
+                                .error(R.drawable.single_artist_icon)           // Fallback image
+                                .circleCrop()                                   // Make the image circular
+                                .into(dialogArtistPicture);
+                    })
+                    .addOnFailureListener(e -> {//cant find image
+                        dialogArtistPicture.setImageResource(R.drawable.single_artist_icon); // Fallback image
+                    });
+        }
+        else {//when they dont have a profile picture
+            //Log.e("URL", "URL of image is null: " + artist.getUsername());
+            dialogArtistPicture.setImageResource(R.drawable.single_artist_icon);
+        }
 
         /*
         if (artist.getProfilePicture() != null) {
