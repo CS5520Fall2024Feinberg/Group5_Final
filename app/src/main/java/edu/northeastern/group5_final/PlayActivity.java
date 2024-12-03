@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.List;
+
 import edu.northeastern.group5_final.models.Song;
 
 public class PlayActivity extends AppCompatActivity implements MyMediaPlayer.Callback {
@@ -45,6 +47,16 @@ public class PlayActivity extends AppCompatActivity implements MyMediaPlayer.Cal
         });
 
         play_or_pause_btn = findViewById(R.id.play_or_pause_btn);
+
+        try {
+            List<Song> playList = MyMediaPlayer.getInstance(this).getPlayList();
+            Song song = playList.get(MyMediaPlayer.getInstance(this).getCurrent());
+            text_view_name.setText(song.getTitle());
+            text_view_artist.setText(song.getArtist());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        play_or_pause_btn.setBackgroundResource(R.drawable.baseline_pause_24);
 
         play_or_pause_btn.setOnClickListener(v -> {
             boolean playing = MyMediaPlayer.getInstance(this).isPlaying();

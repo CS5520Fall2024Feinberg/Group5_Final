@@ -38,6 +38,9 @@
     <string name="txt_mv_subject">Subject:</string>
     <string name="txt_mv_message">Message:</string>
     <string name="btn_mv_close">Close</string>
+    <string name="add">Add</string>
+    <string name="to_play_list"> To PlayList Success</string>
+    <string name="exits_play_list"> Is Exit PlayList</string>
 
     <!-- Dropdown Items for Menu -->
     <string-array name="dropdownMenu_items">

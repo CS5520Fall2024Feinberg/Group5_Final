@@ -48,12 +48,6 @@ public class MyMediaPlayer {
     public MyMediaPlayer(Context applicationContext) {
         this.applicationContext = (Application) applicationContext;
         this.handler = new Handler(Looper.getMainLooper());
-
-        // Dummy song data
-        playList.add(new Song("Song 1", "Artist 1", "rock", false, false, 0, R.raw.sample_song2));
-        playList.add(new Song("Song 2", "Artist 2", "countryside", false, true, 0, R.raw.sample_song3));
-        playList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 0, R.raw.sample_song));
-
     }
 
     public static MyMediaPlayer getInstance(Context context) {

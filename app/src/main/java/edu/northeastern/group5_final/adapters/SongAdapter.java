@@ -1,20 +1,16 @@
 package edu.northeastern.group5_final.adapters;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +19,7 @@ import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
+import edu.northeastern.group5_final.MyMediaPlayer;
 import edu.northeastern.group5_final.R;
 import edu.northeastern.group5_final.models.Song;
 
@@ -58,6 +55,15 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         holder.songArtist.setText(song.getArtist());
         holder.songGenre.setText(song.getGenre());
         holder.progressBar.setProgress(song.getProgress());
+        holder.btnAddSong.setOnClickListener(v -> {
+            List<Song> playList = MyMediaPlayer.getInstance(context).getPlayList();
+            if (!playList.contains(song)){
+                MyMediaPlayer.getInstance(context).addSong(song);
+                Toast.makeText(context, context.getString(R.string.add) + song.getTitle() + context.getString(R.string.to_play_list), Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(context, song.getTitle() + context.getString(R.string.exits_play_list), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         holder.playPauseButton.setImageResource(song.isPlaying() ? R.drawable.pauset : R.drawable.playt);
         holder.favoriteButton.setImageResource(song.isFavorite() ? R.drawable.heartfilled48 : R.drawable.heartunfilled48);
@@ -94,6 +100,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         ImageButton playPauseButton, favoriteButton;
         ProgressBar progressBar;
         MaterialCardView card;
+        View btnAddSong;
 
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -104,6 +111,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             playPauseButton = itemView.findViewById(R.id.btn_play_pause);
             favoriteButton = itemView.findViewById(R.id.btn_favorite);
             progressBar = itemView.findViewById(R.id.song_progress_bar);
+            btnAddSong = itemView.findViewById(R.id.btn_add_song);
         }
     }
 

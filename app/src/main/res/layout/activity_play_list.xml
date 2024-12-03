@@ -8,6 +8,7 @@
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
+        app:titleTextColor="@color/white"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:background="?attr/colorPrimary"
@@ -17,6 +18,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="Current Play List">
+
+
+        <ImageView
+            android:id="@+id/clean"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="10dp"
+            android:padding="5dp"
+            android:src="@drawable/reject_icon" />
 
     </androidx.appcompat.widget.Toolbar>
 

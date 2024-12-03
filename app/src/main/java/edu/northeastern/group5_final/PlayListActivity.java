@@ -18,6 +18,13 @@ public class PlayListActivity extends AppCompatActivity implements MyMediaPlayer
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_list);
         MyMediaPlayer.getInstance(this).addCallback(this);
+        findViewById(R.id.clean).setOnClickListener(v -> {
+            MyMediaPlayer.getInstance(this).stop();
+            MyMediaPlayer.getInstance(this).getPlayList().clear();
+            List<Song> playList = MyMediaPlayer.getInstance(this).getPlayList();
+            RecyclerView playListView = findViewById(R.id.playList);
+            playListView.setAdapter(new PlayListAdapter(this, playList));
+        });
     }
 
     @Override

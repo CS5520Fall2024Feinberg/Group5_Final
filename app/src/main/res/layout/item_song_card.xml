@@ -74,6 +74,13 @@
 
             </LinearLayout>
 
+            <ImageView
+                android:id="@+id/btn_add_song"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@null"
+                android:src="@drawable/add_song" />
+
             <ImageButton
                 android:id="@+id/btn_favorite"
                 android:layout_width="60dp"
