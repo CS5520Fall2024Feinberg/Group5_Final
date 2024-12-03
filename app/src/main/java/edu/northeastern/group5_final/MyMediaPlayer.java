@@ -26,8 +26,11 @@ public class MyMediaPlayer {
     private Callback callback;
     private Handler handler;
 
+
     public interface Callback {
         void onProgress(int progress);
+
+        void onSongChange(Song song);
     }
 
     public void setCallback(Callback callback) {
@@ -77,6 +80,10 @@ public class MyMediaPlayer {
         timer.schedule(timerTask, 1000, 1000);
     }
 
+    public boolean isPlaying() {
+        return mediaPlayer != null && mediaPlayer.isPlaying();
+    }
+
     public void play() {
         if (mediaPlayer != null) {
             mediaPlayer.release();
@@ -85,9 +92,12 @@ public class MyMediaPlayer {
             Song song = playList.get(current);
             mediaPlayer = MediaPlayer.create(applicationContext, song.getSongId());
             mediaPlayer.start();
+            if (callback != null) {
+                callback.onSongChange(song);
+            }
             startTimer();
             mediaPlayer.setOnCompletionListener(mp -> {
-
+                next();
             });
         } catch (Exception e) {
             e.printStackTrace();
