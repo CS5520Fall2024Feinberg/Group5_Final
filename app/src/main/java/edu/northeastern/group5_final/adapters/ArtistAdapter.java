@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +26,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,16 +63,40 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
     @Override
     public void onBindViewHolder(@NonNull ArtistViewHolder holder, int position) {
         Artist artist = artistList.get(position);
+        Toast.makeText(context, "This is a Toast message", Toast.LENGTH_SHORT).show();
 
         holder.artistName.setText(artist.getName());
         holder.albumsReleased.setText("Albums: " + artist.getTotalSongsReleased());
         holder.joinDate.setText("Joined: " + artist.getJoinedDate());
 
+        //not sure if we need this
+        /*
         if (artist.getProfilePicture() != null) {
             holder.artistPicture.setImageURI(artist.getProfilePicture());
         } else {
             holder.artistPicture.setImageResource(artist.getIsIndividual() ? R.drawable.single_artist_icon : R.drawable.artists_group_icon);
         }
+
+         */
+
+        //setting profile picture
+        String Url = "gs://cs5520-group5-final.firebasestorage.app/profile_pictures/" + artist.getUsername() + ".jpg";
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReferenceFromUrl(Url);
+
+        storageReference.getDownloadUrl()
+                .addOnSuccessListener(uri -> {
+                    Glide.with(context)
+                            .load(uri.toString())
+                            .placeholder(R.drawable.single_artist_icon)
+                            .error(R.drawable.single_artist_icon)           // Fallback image
+                            .circleCrop()                                   // Make the image circular
+                            .into(holder.artistPicture);
+                })
+                .addOnFailureListener(e -> {//cant find image
+                    holder.artistPicture.setImageResource(R.drawable.single_artist_icon); // Fallback image
+                });
+
 
         switch (artist.getStatus()) {
             case PLUS:
@@ -116,6 +144,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
     private void showRequestDialog(Artist artist, int position) {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_send_request, null);
         AlertDialog dialog = new AlertDialog.Builder(context).setView(dialogView).create();
+        Toast test = Toast.makeText(context, "test!@#$", Toast.LENGTH_SHORT);
 
         EditText etSuggestedBandName = dialogView.findViewById(R.id.et_suggested_band_name);
         EditText etSubject = dialogView.findViewById(R.id.et_subject);
@@ -148,6 +177,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
         String requestorUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         String recipientUsername = artist.getUsername();
         String requestId = requestsRef.push().getKey();
+        Toast test = Toast.makeText(context, "test", Toast.LENGTH_SHORT);
 
         Map<String, Object> request = new HashMap<>();
         request.put("requestorUsername", requestorUsername);
@@ -204,11 +234,36 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
         TextView dialogArtistJoinedDate = dialogView.findViewById(R.id.dialog_artist_joined_date);
         RecyclerView dialogArtistSongsRecyclerView = dialogView.findViewById(R.id.dialog_artist_songs_recycler_view);
 
+
+        //setting profile picture
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        String Url = "gs://cs5520-group5-final.firebasestorage.app/profile_pictures/" + artist.getUsername() + ".jpg";
+        StorageReference storageReference = storage.getReferenceFromUrl(Url);
+
+        storageReference.getDownloadUrl()
+                .addOnSuccessListener(uri -> {
+                    Glide.with(context)
+                            .load(uri.toString())
+                            .placeholder(R.drawable.single_artist_icon)
+                            .error(R.drawable.single_artist_icon)           // if something goes wrong
+                            .circleCrop()                                   // Make the image circular
+                            .into(dialogArtistPicture);
+                })
+                .addOnFailureListener(e -> {
+                    //cant find image
+                    dialogArtistPicture.setImageResource(R.drawable.single_artist_icon); // Fallback image
+                });
+
+        /*
         if (artist.getProfilePicture() != null) {
             dialogArtistPicture.setImageURI(artist.getProfilePicture());
         } else {
             dialogArtistPicture.setImageResource(R.drawable.single_artist_icon);
         }
+
+         */
+
+
         dialogArtistUsername.setText("@" + artist.getUsername());
         dialogArtistName.setText(artist.getName());
         dialogArtistBio.setText(artist.getBio());

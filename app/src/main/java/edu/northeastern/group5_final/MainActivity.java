@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
             //check if username and password are empty
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Please enter both username and password", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Please enter both username and password!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
