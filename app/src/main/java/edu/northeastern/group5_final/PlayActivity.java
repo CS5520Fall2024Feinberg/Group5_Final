@@ -12,16 +12,17 @@ import edu.northeastern.group5_final.models.Song;
 
 public class PlayActivity extends AppCompatActivity implements MyMediaPlayer.Callback {
 
-    TextView text_view_name;
-    TextView text_view_artist;
-    SeekBar seek_bar;
+    private TextView text_view_name;
+    private TextView text_view_artist;
+    private SeekBar seek_bar;
+    private View play_or_pause_btn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-        MyMediaPlayer.getInstance(this).setCallback(this);
+        MyMediaPlayer.getInstance(this).addCallback(this);
 
         findViewById(R.id.play_last_btn).setOnClickListener(v -> {
             MyMediaPlayer.getInstance(this).prefix();
@@ -43,14 +44,15 @@ public class PlayActivity extends AppCompatActivity implements MyMediaPlayer.Cal
             MyMediaPlayer.getInstance(this).stop();
         });
 
-        View play_or_pause_btn = findViewById(R.id.play_or_pause_btn);
+        play_or_pause_btn = findViewById(R.id.play_or_pause_btn);
+
         play_or_pause_btn.setOnClickListener(v -> {
             boolean playing = MyMediaPlayer.getInstance(this).isPlaying();
             if (playing) {
                 MyMediaPlayer.getInstance(this).pause();
-                play_or_pause_btn.setBackgroundResource(R.drawable.baseline_pause_24);
-            } else {
                 play_or_pause_btn.setBackgroundResource(R.drawable.baseline_play_arrow_24);
+            } else {
+                play_or_pause_btn.setBackgroundResource(R.drawable.baseline_pause_24);
                 MyMediaPlayer.getInstance(this).play();
             }
         });
@@ -62,9 +64,39 @@ public class PlayActivity extends AppCompatActivity implements MyMediaPlayer.Cal
         seek_bar.setProgress(progress);
     }
 
+
     @Override
-    public void onSongChange(Song song) {
+    protected void onDestroy() {
+        super.onDestroy();
+        MyMediaPlayer.getInstance(this).removeCallback(this);
+    }
+
+    @Override
+    public void onPlay(Song song) {
         text_view_name.setText(song.getTitle());
         text_view_artist.setText(song.getArtist());
+        play_or_pause_btn.setBackgroundResource(R.drawable.baseline_pause_24);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean playing = MyMediaPlayer.getInstance(this).isPlaying();
+        if (playing) {
+            play_or_pause_btn.setBackgroundResource(R.drawable.baseline_pause_24);
+        } else {
+            play_or_pause_btn.setBackgroundResource(R.drawable.baseline_play_arrow_24);
+        }
+    }
+
+    @Override
+    public void onPause(Song song) {
+        play_or_pause_btn.setBackgroundResource(R.drawable.baseline_play_arrow_24);
+    }
+
+    @Override
+    public void onStop(Song song) {
+        play_or_pause_btn.setBackgroundResource(R.drawable.baseline_play_arrow_24);
     }
 }

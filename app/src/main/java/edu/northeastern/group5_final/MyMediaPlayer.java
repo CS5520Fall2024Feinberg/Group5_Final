@@ -20,30 +20,40 @@ public class MyMediaPlayer {
 
     private MediaPlayer mediaPlayer;
     private final List<Song> playList = new ArrayList<>();
-    private volatile int current;
+    private int current;
     private Timer timer;
     private TimerTask timerTask;
-    private Callback callback;
+    private List<Callback> callbacks = new ArrayList<>();
     private Handler handler;
 
 
     public interface Callback {
         void onProgress(int progress);
 
-        void onSongChange(Song song);
+        void onPlay(Song song);
+
+        void onPause(Song song);
+
+        void onStop(Song song);
     }
 
-    public void setCallback(Callback callback) {
-        this.callback = callback;
+    public void addCallback(Callback callback) {
+        this.callbacks.add(callback);
     }
 
-    public Callback getCallback() {
-        return callback;
+    public void removeCallback(Callback callback) {
+        this.callbacks.remove(callback);
     }
 
     public MyMediaPlayer(Context applicationContext) {
         this.applicationContext = (Application) applicationContext;
         this.handler = new Handler(Looper.getMainLooper());
+
+        // Dummy song data
+        playList.add(new Song("Song 1", "Artist 1", "rock", false, false, 0, R.raw.sample_song2));
+        playList.add(new Song("Song 2", "Artist 2", "countryside", false, true, 0, R.raw.sample_song3));
+        playList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 0, R.raw.sample_song));
+
     }
 
     public static MyMediaPlayer getInstance(Context context) {
@@ -68,12 +78,24 @@ public class MyMediaPlayer {
         }
     }
 
+    private void onProgress(int progress) {
+        for (Callback callback : callbacks) {
+            callback.onProgress(progress);
+        }
+    }
+
     private void startTimer() {
         timerTask = new TimerTask() {
             @Override
             public void run() {
-                int progress = (mediaPlayer.getCurrentPosition() * 100) / mediaPlayer.getDuration();
-                handler.post(() -> callback.onProgress(progress));
+                handler.post(() -> {
+                    try {
+                        int progress = (mediaPlayer.getCurrentPosition() * 100) / mediaPlayer.getDuration();
+                        onProgress(progress);
+                    } catch (Exception ignored) {
+
+                    }
+                });
             }
         };
         timer = new Timer();
@@ -84,6 +106,17 @@ public class MyMediaPlayer {
         return mediaPlayer != null && mediaPlayer.isPlaying();
     }
 
+    public void play(Song song) {
+        current = playList.indexOf(song);
+        play();
+    }
+
+    public void onPlay(Song song) {
+        for (Callback callback : callbacks) {
+            callback.onPlay(song);
+        }
+    }
+
     public void play() {
         if (mediaPlayer != null) {
             mediaPlayer.release();
@@ -92,9 +125,7 @@ public class MyMediaPlayer {
             Song song = playList.get(current);
             mediaPlayer = MediaPlayer.create(applicationContext, song.getSongId());
             mediaPlayer.start();
-            if (callback != null) {
-                callback.onSongChange(song);
-            }
+            onPlay(song);
             startTimer();
             mediaPlayer.setOnCompletionListener(mp -> {
                 next();
@@ -105,7 +136,7 @@ public class MyMediaPlayer {
     }
 
     public void next() {
-        if (current > playList.size()) {
+        if (current >= playList.size() - 1) {
             current = -1;
         }
         current += 1;
@@ -113,16 +144,34 @@ public class MyMediaPlayer {
     }
 
     public void prefix() {
-        if (current < 0) {
+        if (current <= 0) {
             current = playList.size();
         }
         current -= 1;
         play();
     }
 
+    public void onPause(Song song) {
+        for (Callback callback : callbacks) {
+            callback.onPause(song);
+        }
+    }
+
     public void pause() {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
+            Song song = playList.get(current);
+            onPause(song);
+        }
+    }
+
+    public int getCurrent() {
+        return current;
+    }
+
+    private void onStop(Song song) {
+        for (Callback callback : callbacks) {
+            callback.onStop(song);
         }
     }
 
@@ -130,6 +179,8 @@ public class MyMediaPlayer {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
             stopTimer();
+            Song song = playList.get(current);
+            onStop(song);
         }
     }
 
