@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -29,8 +30,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import edu.northeastern.group5_final.R;
@@ -135,10 +139,13 @@ public class InboxActivity extends AppCompatActivity {
 
         //Recycler View set up
         RecyclerView recyclerView = findViewById(R.id.rc_inbox_messages);
-        testSetUpMessages();
+        //testSetUpMessages();
+        //setUpMessages();
         Inbox_recyclerViewAdapter adapter = new Inbox_recyclerViewAdapter(this, messages);
+
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        setUpMessages(adapter);
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -155,7 +162,58 @@ public class InboxActivity extends AppCompatActivity {
         return true;
     }
 
-    private void setUpMessages(){
+    private void setUpMessages(Inbox_recyclerViewAdapter adapter){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference messagesRef = database.getReference("messages");
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        String username = currentUser.getDisplayName();
+        Log.d("FirebaseAuth", "Display Name or username: " + username);
+
+        messagesRef.orderByChild("receiver").equalTo(username)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Log.d("Firebase", "Number of messages!: " + snapshot.getChildrenCount());
+                        for (DataSnapshot messageSnapshot : snapshot.getChildren()) {
+                            Map<String, String> messagedb = (Map<String, String>) messageSnapshot.getValue();
+                            if (messagedb != null) {
+                                Log.d("Firebase", "Message: " + messagedb.get("message"));
+                                String sender = messagedb.get("sender");
+                                String subject = messagedb.get("subject");
+                                //String date = messagedb.get("timestamp");
+                                String receiver = messagedb.get("receiver");
+                                String body = messagedb.get("message");
+                                String timestamp = messagedb.get("timestamp");
+
+                                Date date = new Date(Long.parseLong(timestamp));
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm z", Locale.getDefault());
+                                String formattedDate = dateFormat.format(date);
+
+                                Messages message = new Messages(sender, body, formattedDate, subject, receiver);
+                                messages.add(message);
+                                Toast test = Toast.makeText(InboxActivity.this, "Message received", Toast.LENGTH_SHORT);
+                            }
+                        }
+
+                        adapter.notifyDataSetChanged();
+                        TextView txtInboxCount = findViewById(R.id.txt_inboxCount);
+                        Log.e("Firebase", "inbox count: " + messages.size());
+                        //txtInboxCount.setText("TESTSTEST!");
+                        txtInboxCount.setText("Inbox(" +messages.size() + ")");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("Firebase", "Error querying messages: " + error.getMessage());
+                    }
+                });
+
+        //adapter.notifyDataSetChanged();
+        //TextView txtInboxCount = findViewById(R.id.txt_inboxCount);
+        //Log.e("Firebase", "inbox count: " + messages.size());
+        //txtInboxCount.setText("TESTSTEST!");
+        //txtInboxCount.setText("Inbox(" +messages.size() + ")");
+
 
     }
     private void testSetUpMessages(){

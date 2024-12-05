@@ -39,7 +39,7 @@ public class Inbox_recyclerViewAdapter extends RecyclerView.Adapter<Inbox_recycl
 
     @Override
     public void onBindViewHolder(@NonNull Inbox_recyclerViewAdapter.MyViewHolder holder, int position) {
-        holder.txtSender.setText(messages.get(position).getReceiver());
+        holder.txtSender.setText(messages.get(position).getSender());
         holder.txtSubject.setText(messages.get(position).getTopic());
         holder.txtDate.setText(messages.get(position).getDate());
 
@@ -56,6 +56,7 @@ public class Inbox_recyclerViewAdapter extends RecyclerView.Adapter<Inbox_recycl
             TextView txtmvSubject = viewDialog.findViewById(R.id.txt_mv_subjectVal);
             TextView txtmvSender = viewDialog.findViewById(R.id.txt_mv_senderVal);
             TextView txtmvMessage = viewDialog.findViewById(R.id.txt_mv_messageVal);
+
             txtmvDate.setText(messages.get(position).getDate());
             txtmvSubject.setText(messages.get(position).getTopic());
             txtmvSender.setText(messages.get(position).getSender());
