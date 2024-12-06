@@ -11,7 +11,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.util.ArrayList;
+
+import edu.northeastern.group5_final.models.Artist;
 
 public class SR_RecyclerViewAdapter extends RecyclerView.Adapter<SR_RecyclerViewAdapter.MyViewHolder> {
     Context context;
@@ -40,6 +46,32 @@ public class SR_RecyclerViewAdapter extends RecyclerView.Adapter<SR_RecyclerView
         holder.txtMemberInfo.setText("Member of: " + searchResults.get(position).getMemberInfo());
         //TODO: add profile pic
         holder.profilePic.setImageResource(R.drawable.ic_launcher_background);
+        SearchResults searchResult = searchResults.get(position);
+
+        if (searchResult.getProfilePic() != null) {
+            String Url = searchResult.getProfilePic().toString();
+            //Log.e("URL", "URL of image: : " + Url2);
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageReference = storage.getReferenceFromUrl(Url);
+            storageReference.getDownloadUrl()
+                    .addOnSuccessListener(uri -> {
+                        Glide.with(context)
+                                .load(uri.toString())
+                                .placeholder(R.drawable.single_artist_icon)
+                                .error(R.drawable.single_artist_icon)           // Fallback image
+                                .circleCrop()                                   // Make the image circular
+                                .into(holder.profilePic);
+                    })
+                    .addOnFailureListener(e -> {//cant find image
+                        holder.profilePic.setImageResource(R.drawable.single_artist_icon); // Fallback image
+                    });
+        }
+        else {//when they dont have a profile picture
+            //Log.e("URL", "URL of image is null: " + artist.getUsername());
+            holder.profilePic.setImageResource(R.drawable.single_artist_icon);
+        }
+
+
     }
 
     @Override

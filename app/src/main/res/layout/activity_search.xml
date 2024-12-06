@@ -55,8 +55,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.47"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rbtn_sa_bands"
-        app:layout_constraintVertical_bias="0.428" />
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup_sa"
+        app:layout_constraintVertical_bias="0.652" />
 
     <Button
         android:id="@+id/btn_search"
@@ -86,27 +86,30 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:layout_constraintVertical_bias="0.033" />
 
-    <RadioButton
-        android:id="@+id/rbtn_sa_users"
-        android:layout_width="wrap_content"
+    <RadioGroup
+        android:id="@+id/radioGroup_sa"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/rbtn_sa_users"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.126"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txte_sa_search"
-        app:layout_constraintVertical_bias="0.074" />
+        app:layout_constraintVertical_bias="0.0">
 
-    <RadioButton
-        android:id="@+id/rbtn_sa_bands"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/rbtn_sa_bands"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.559"
-        app:layout_constraintStart_toEndOf="@+id/rbtn_sa_users"
-        app:layout_constraintTop_toBottomOf="@+id/btn_search"
-        app:layout_constraintVertical_bias="0.074" />
+        <RadioButton
+            android:id="@+id/rbtn_sa_users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/rbtn_sa_users" /> <!-- Default selected -->
+
+        <RadioButton
+            android:id="@+id/rbtn_sa_bands"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rbtn_sa_bands" />
+    </RadioGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>
