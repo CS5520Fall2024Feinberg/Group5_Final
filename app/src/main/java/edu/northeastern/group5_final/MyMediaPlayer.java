@@ -117,7 +117,7 @@ public class MyMediaPlayer {
         }
         try {
             Song song = playList.get(current);
-            mediaPlayer = MediaPlayer.create(applicationContext, song.getSongId());
+//            mediaPlayer = MediaPlayer.create(applicationContext, song.getSongId());
             mediaPlayer.start();
             onPlay(song);
             startTimer();

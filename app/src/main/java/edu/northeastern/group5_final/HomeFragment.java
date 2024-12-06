@@ -21,12 +21,21 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
 import java.util.ArrayList;
@@ -34,6 +43,7 @@ import java.util.List;
 
 import edu.northeastern.group5_final.adapters.SongAdapter;
 import edu.northeastern.group5_final.models.Song;
+import edu.northeastern.group5_final.models.SongDBModel;
 
 
 public class HomeFragment extends Fragment {
@@ -48,13 +58,10 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        populateSongs();
+
         RecyclerView recyclerView = view.findViewById(R.id.song_list_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // Dummy song data
-        songList.add(new Song("Song 1", "Artist 1", "rock", false, false, 0, R.raw.sample_song2));
-        songList.add(new Song("Song 2", "Artist 2", "countryside", false, true, 0, R.raw.sample_song3));
-        songList.add(new Song("Song 3", "Artist 3", "relaxing", false, false, 0, R.raw.sample_song));
 
         adapter = new SongAdapter(getContext(), songList);
         recyclerView.setAdapter(adapter);
@@ -127,19 +134,98 @@ public class HomeFragment extends Fragment {
                 String selectedGenre = genreSpinner.getSelectedItem().toString();
 
                 if (!songTitle.isEmpty() && !artistName.isEmpty() && !selectedGenre.isEmpty()) {
-                    Song newSong = new Song(songTitle, artistName, selectedGenre, false, false, 0, R.raw.sample_song); //selectedFileUri[0].toString()
-                    songList.add(newSong);
-                    adapter.notifyItemInserted(songList.size() - 1);
-                    dialog.dismiss();
+
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference storageReference = storage.getReference("songs");
+
+                    StorageReference songRef = storageReference.child(songTitle + "_" + System.currentTimeMillis());
+
+                    songRef.putFile(selectedFileUri)
+                            .addOnSuccessListener(taskSnapshot -> {
+                                songRef.getDownloadUrl().addOnSuccessListener(uri -> {
+
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("songs");
+                                    String songId = databaseReference.push().getKey();
+
+                                    String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                                    List<String> artists = new ArrayList<>();
+                                    artists.add(currentUsername);
+
+                                    SongDBModel newSong = new SongDBModel(songId, songTitle, uri.toString(), selectedGenre, artists);
+
+//                                    songList.add(newSong);
+//                                    adapter.notifyItemInserted(songList.size() - 1);
+                                    dialog.dismiss();
+
+
+                                    if (songId != null) {
+                                        databaseReference.child(songId).setValue(newSong)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Toast.makeText(getContext(), "Song added successfully to Realtime Database!", Toast.LENGTH_SHORT).show();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(getContext(), "Failed to add song to Realtime Database: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                });
+                                    } else {
+                                        Toast.makeText(getContext(), "Failed to generate song ID", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    Toast.makeText(getContext(), "Song added successfully!", Toast.LENGTH_SHORT).show();
+                                }).addOnFailureListener(e -> {
+                                    Toast.makeText(getContext(), "Failed to get song URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(getContext(), "Failed to upload song: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+
                 } else {
                     Toast.makeText(getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 }
-
-
+            } else {
+                Toast.makeText(getContext(), "No file selected", Toast.LENGTH_SHORT).show();
             }
         });
 
+
         dialog.show();
+    }
+
+
+    private void populateSongs() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("songs");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                songList.clear();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String songId = snapshot.getKey();
+                    SongDBModel songdb = snapshot.getValue(SongDBModel.class);
+                    if (songdb != null) {
+                        Log.d("TAG", "onDataChange: " + songdb.getUrl());
+                        songList.add(
+                                new Song(
+                                        songId,
+                                        songdb.getTitle(),
+                                        "Unknown",
+                                        songdb.getGenre(),
+                                        false,
+                                        false,
+                                        0,
+                                        songdb.getUrl()
+                                )
+                        );
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Failed to fetch songs: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 

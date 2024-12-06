@@ -1,23 +1,34 @@
 package edu.northeastern.group5_final.models;
 
 public class Song {
+    private String id;
     private String title;
     private String artist;
     private String genre;
     private boolean isPlaying;
     private boolean isFavorite;
     private int progress;
-    private int songId;
+    private String songUrl;
 
 
-    public Song(String title, String artist, String genre, boolean isPlaying, boolean isFavorite, int progress, int songId) {
+    public Song(String id, String title, String artist, String genre, boolean isPlaying, boolean isFavorite, int progress, String songUrl) {
+
+        this.id = id;
         this.title = title;
         this.artist = artist;
         this.genre = genre;
         this.isPlaying = isPlaying;
         this.isFavorite = isFavorite;
         this.progress = progress;
-        this.songId = songId;
+        this.songUrl = songUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -62,12 +73,12 @@ public class Song {
         this.progress = progress;
     }
 
-    public int getSongId() {
-        return songId;
+    public String getSongUrl() {
+        return songUrl;
     }
 
-    public void setSongId(int songId) {
-        this.songId = songId;
+    public void setSongUrl(String songUrl) {
+        this.songUrl = songUrl;
     }
 
 }

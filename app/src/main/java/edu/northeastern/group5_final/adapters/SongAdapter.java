@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -128,19 +129,29 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         if (mediaPlayer != null) {
             mediaPlayer.release();
+            mediaPlayer = null;
         }
 
         try {
-            mediaPlayer = MediaPlayer.create(context, song.getSongId());
-            mediaPlayer.start();
-
+            mediaPlayer = new MediaPlayer();
+            Log.d("TAG", "playSong: " + song.getSongUrl());
+            mediaPlayer.setDataSource(song.getSongUrl());
+            mediaPlayer.prepareAsync();
             notifyItemChanged(position);
+
+            mediaPlayer.setOnPreparedListener(mp -> {
+                song.setPlaying(true);
+                notifyItemChanged(position);
+                mediaPlayer.start();
+            });
 
             mediaPlayer.setOnCompletionListener(mp -> {
                 song.setPlaying(false);
                 notifyItemChanged(position);
                 currentlyPlayingIndex = -1;
 
+                mediaPlayer.release();
+                mediaPlayer = null;
             });
 
         } catch (Exception e) {
