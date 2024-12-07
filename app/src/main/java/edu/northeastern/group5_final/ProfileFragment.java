@@ -38,10 +38,12 @@ import java.util.List;
 
 import edu.northeastern.group5_final.adapters.CollaborationsListAdapter;
 import edu.northeastern.group5_final.adapters.FavoritesListAdapter;
+import edu.northeastern.group5_final.adapters.MySongsListAdapter;
 import edu.northeastern.group5_final.models.Artist;
 import edu.northeastern.group5_final.models.ArtistDBModel;
 import edu.northeastern.group5_final.models.Collaboration;
 import edu.northeastern.group5_final.models.FavoriteSong;
+import edu.northeastern.group5_final.models.MySong;
 import edu.northeastern.group5_final.models.RequestDBModel;
 import edu.northeastern.group5_final.models.Song;
 import edu.northeastern.group5_final.models.SongDBModel;
@@ -51,11 +53,14 @@ public class ProfileFragment extends Fragment {
 
     private TextView username, fullname, joined;
     private ImageView profileImage;
-    private RecyclerView favoritesListRV, collaborationsListRV;
+    private RecyclerView favoritesListRV, collaborationsListRV, mySongsListRV;
     private FavoritesListAdapter favoritesAdapter;
     private CollaborationsListAdapter collaborationsAdapter;
+    private MySongsListAdapter mySongsAdapter;
     private List<FavoriteSong> favoriteSongs;
     private List<Collaboration> collaborations;
+    private List<MySong> mySongs;
+
 
 
     @Override
@@ -96,7 +101,50 @@ public class ProfileFragment extends Fragment {
         collaborationsAdapter = new CollaborationsListAdapter(getContext(), collaborations);
         collaborationsListRV.setAdapter(collaborationsAdapter);
 
+        mySongs = new ArrayList<>();
+        populateMySongs();
+
+        mySongsListRV = view.findViewById(R.id.my_songs_list);
+        mySongsListRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        mySongsAdapter = new MySongsListAdapter(getContext(), mySongs);
+        mySongsListRV.setAdapter(mySongsAdapter);
+
+
         return view;
+    }
+
+    private void populateMySongs() {
+
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("songs");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mySongs.clear();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    SongDBModel songdb = snapshot.getValue(SongDBModel.class);
+
+                    if (songdb == null || songdb.getArtists() == null) continue;
+                    if (!songdb.getArtists().contains(currentUsername)) continue;
+
+                    mySongs.add(
+                            new MySong(
+                                songdb.getTitle(),
+                                songdb.getReleaseDate(),
+                                songdb.getGenre()
+                            )
+                    );
+                }
+                mySongsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Failed to fetch songs: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     private void fetchSelfUserData() {
