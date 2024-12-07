@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,8 +41,10 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.northeastern.group5_final.adapters.SongAdapter;
+import edu.northeastern.group5_final.models.RequestDBModel;
 import edu.northeastern.group5_final.models.Song;
 import edu.northeastern.group5_final.models.SongDBModel;
 
@@ -53,12 +56,15 @@ public class HomeFragment extends Fragment {
     SongAdapter adapter;
     private AlertDialog dialog;
     private Uri selectedFileUri;
+    List<RequestDBModel> userRequests = new ArrayList<>();
+    private RequestDBModel selectedArtist;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         populateSongs();
+        fetchCurrentUserCollabirations();
 
         RecyclerView recyclerView = view.findViewById(R.id.song_list_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -80,21 +86,19 @@ public class HomeFragment extends Fragment {
             selectedFileUri = data.getData();
             if (selectedFileUri != null && dialog != null) {
                 String songTitle = getFileName(selectedFileUri);
-                String artistName = getArtistName(selectedFileUri);
 
                 EditText editSongTitle = dialog.findViewById(R.id.edit_song_title);
-                EditText editArtistName = dialog.findViewById(R.id.edit_artist_name);
+                Spinner artistsSpinner = dialog.findViewById(R.id.artists_spinner);
                 Spinner genreSpinner = dialog.findViewById(R.id.genre_spinner);
                 Button confirmAddButton = dialog.findViewById(R.id.confirm_add_btn);
 
-                if (editSongTitle != null && editArtistName != null && confirmAddButton != null) {
+                if (editSongTitle != null && confirmAddButton != null) {
                     editSongTitle.setVisibility(View.VISIBLE);
-                    editArtistName.setVisibility(View.VISIBLE);
+                    artistsSpinner.setVisibility(View.VISIBLE);
                     confirmAddButton.setVisibility(View.VISIBLE);
                     genreSpinner.setVisibility(View.VISIBLE);
 
                     editSongTitle.setText(songTitle);
-                    editArtistName.setText(artistName);
                 }
             }
         }
@@ -103,94 +107,157 @@ public class HomeFragment extends Fragment {
 
     private void openAddSongDialog() {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_file_picker, null);
-
         AlertDialog dialog = new AlertDialog.Builder(getContext()).setView(dialogView).create();
 
+        handleArtistSpinner(dialogView);
+        handleGenreSpinner(dialogView);
+
         Button openFilePickerButton = dialogView.findViewById(R.id.open_file_picker_btn);
-        EditText editSongTitle = dialogView.findViewById(R.id.edit_song_title);
-        EditText editArtistName = dialogView.findViewById(R.id.edit_artist_name);
-        Spinner genreSpinner = dialogView.findViewById(R.id.genre_spinner);
-        Button confirmAddButton = dialogView.findViewById(R.id.confirm_add_btn);
-
-        ArrayAdapter<String> genreAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, new String[]{"Rock", "Sufi", "Countryside"});
-        genreAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        genreSpinner.setAdapter(genreAdapter);
-
         openFilePickerButton.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("audio/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             startActivityForResult(Intent.createChooser(intent, "Select a Song"), PICK_AUDIO_REQUEST);
-
             this.dialog = dialog;
         });
 
-        confirmAddButton.setOnClickListener(v -> {
-
-            if (selectedFileUri != null) {
-
-                String songTitle = editSongTitle.getText().toString().trim();
-                String artistName = editArtistName.getText().toString().trim();
-                String selectedGenre = genreSpinner.getSelectedItem().toString();
-
-                if (!songTitle.isEmpty() && !artistName.isEmpty() && !selectedGenre.isEmpty()) {
-
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageReference = storage.getReference("songs");
-
-                    StorageReference songRef = storageReference.child(songTitle + "_" + System.currentTimeMillis());
-
-                    songRef.putFile(selectedFileUri)
-                            .addOnSuccessListener(taskSnapshot -> {
-                                songRef.getDownloadUrl().addOnSuccessListener(uri -> {
-
-                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("songs");
-                                    String songId = databaseReference.push().getKey();
-
-                                    String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-                                    List<String> artists = new ArrayList<>();
-                                    artists.add(currentUsername);
-
-                                    SongDBModel newSong = new SongDBModel(songId, songTitle, uri.toString(), selectedGenre, artists);
-
-//                                    songList.add(newSong);
-//                                    adapter.notifyItemInserted(songList.size() - 1);
-                                    dialog.dismiss();
-
-
-                                    if (songId != null) {
-                                        databaseReference.child(songId).setValue(newSong)
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Toast.makeText(getContext(), "Song added successfully to Realtime Database!", Toast.LENGTH_SHORT).show();
-                                                })
-                                                .addOnFailureListener(e -> {
-                                                    Toast.makeText(getContext(), "Failed to add song to Realtime Database: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                });
-                                    } else {
-                                        Toast.makeText(getContext(), "Failed to generate song ID", Toast.LENGTH_SHORT).show();
-                                    }
-
-                                    Toast.makeText(getContext(), "Song added successfully!", Toast.LENGTH_SHORT).show();
-                                }).addOnFailureListener(e -> {
-                                    Toast.makeText(getContext(), "Failed to get song URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                });
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(getContext(), "Failed to upload song: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
-
-                } else {
-                    Toast.makeText(getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(getContext(), "No file selected", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
+        Button confirmAddButton = dialogView.findViewById(R.id.confirm_add_btn);
+        confirmAddButton.setOnClickListener(v -> confirmAddSong(dialogView));
         dialog.show();
     }
 
+    private void handleArtistSpinner(View dialogView) {
+        List<RequestDBModel> options = new ArrayList<>();
+        RequestDBModel r = new RequestDBModel();
+        r.setBandName("SOLO");
+        options.add(r);
+        options.addAll(userRequests);
+
+        Spinner artistsSpinner = dialogView.findViewById(R.id.artists_spinner);
+        ArrayAdapter<RequestDBModel> artistsAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, options);
+        artistsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        artistsSpinner.setAdapter(artistsAdapter);
+
+        artistsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                RequestDBModel s = (RequestDBModel) artistsSpinner.getSelectedItem();
+                Log.d("TAG", "onItemSelected: " + s.getBandName());
+                if (s != null) { selectedArtist = s; }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void handleGenreSpinner(View dialogView) {
+        Spinner genreSpinner = dialogView.findViewById(R.id.genre_spinner);
+        ArrayAdapter<String> genreAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, new String[]{"Rock", "Sufi", "Countryside"});
+        genreAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        genreSpinner.setAdapter(genreAdapter);
+    }
+
+    private void confirmAddSong(View dialogView) {
+
+        EditText editSongTitle = dialogView.findViewById(R.id.edit_song_title);
+        Spinner genreSpinner = dialogView.findViewById(R.id.genre_spinner);
+
+        if (selectedFileUri != null) {
+
+            String songTitle = editSongTitle.getText().toString().trim();
+            String selectedGenre = genreSpinner.getSelectedItem().toString();
+
+            if (!songTitle.isEmpty() && !selectedArtist.getBandName().isEmpty() && !selectedGenre.isEmpty()) {
+                uploadSongToFirebase(songTitle, selectedGenre);
+            } else {
+                Toast.makeText(getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(getContext(), "No file selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void uploadSongToFirebase(String songTitle, String selectedGenre) {
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference("songs");
+
+        StorageReference songRef = storageReference.child(songTitle + "_" + System.currentTimeMillis());
+
+        songRef.putFile(selectedFileUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    songRef.getDownloadUrl().addOnSuccessListener(uri -> {
+
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("songs");
+                        String songId = databaseReference.push().getKey();
+
+                        String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+                        List<String> artists = new ArrayList<>();
+                        artists.add(currentUsername);
+
+                        if (!selectedArtist.getBandName().equals("SOLO")) {
+                            String otherArtistName = selectedArtist.getRecipientUsername().equals(currentUsername) ?
+                                    selectedArtist.getRequestorUsername() :
+                                    selectedArtist.getRecipientUsername();;
+                            artists.add(otherArtistName);
+                        }
+
+                        SongDBModel newSong = new SongDBModel(songId, songTitle, uri.toString(), selectedGenre, artists);
+
+                        dialog.dismiss();
+
+
+                        if (songId != null) {
+                            databaseReference.child(songId).setValue(newSong)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(getContext(), "Song added successfully to Realtime Database!", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getContext(), "Failed to add song to Realtime Database: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            Toast.makeText(getContext(), "Failed to generate song ID", Toast.LENGTH_SHORT).show();
+                        }
+
+                        Toast.makeText(getContext(), "Song added successfully!", Toast.LENGTH_SHORT).show();
+                    }).addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Failed to get song URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to upload song: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void fetchCurrentUserCollabirations() {
+
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("requests");
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    RequestDBModel request = snapshot.getValue(RequestDBModel.class);
+
+                    if (request != null &&
+                            "DONE".equals(request.getStatus()) &&
+                            (currentUsername.equals(request.getRecipientUsername()) ||
+                                    currentUsername.equals(request.getRequestorUsername()))) {
+
+                        userRequests.add(request);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Failed to fetch requests: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     private void populateSongs() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("songs");
@@ -203,7 +270,6 @@ public class HomeFragment extends Fragment {
                     String songId = snapshot.getKey();
                     SongDBModel songdb = snapshot.getValue(SongDBModel.class);
                     if (songdb != null) {
-                        Log.d("TAG", "onDataChange: " + songdb.getUrl());
                         songList.add(
                                 new Song(
                                         songId,

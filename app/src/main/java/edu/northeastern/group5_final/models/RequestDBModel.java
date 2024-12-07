@@ -66,5 +66,13 @@ public class RequestDBModel {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
+
+    @Override
+    public String toString() {
+        if (bandName.equals("SOLO")){
+            return "SOLO";
+        }
+        return bandName + " (" + requestorUsername + ", " + recipientUsername + ")";
+    }
 }
 
