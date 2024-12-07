@@ -9,9 +9,10 @@ public class Song {
     private boolean isFavorite;
     private int progress;
     private String songUrl;
+    private int likedBy;
+    private String releaseDate;
 
-
-    public Song(String id, String title, String artist, String genre, boolean isPlaying, boolean isFavorite, int progress, String songUrl) {
+    public Song(String id, String title, String artist, String genre, boolean isPlaying, boolean isFavorite, int progress, String songUrl, int likedBy, String releaseDate) {
 
         this.id = id;
         this.title = title;
@@ -21,7 +22,34 @@ public class Song {
         this.isFavorite = isFavorite;
         this.progress = progress;
         this.songUrl = songUrl;
+        this.likedBy = likedBy;
+        this.releaseDate = releaseDate;
     }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public int getLikedBy() {
+        return likedBy;
+    }
+
+    public void setLikedBy(int likedBy) {
+        this.likedBy = likedBy;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(String releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
 
     public String getId() {
         return id;

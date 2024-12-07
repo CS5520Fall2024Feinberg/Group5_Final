@@ -131,7 +131,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         TextView genre = dialog.findViewById(R.id.dialog_song_genre);
         TextView releaseDate = dialog.findViewById(R.id.dialog_song_release_date);
         TextView artists = dialog.findViewById(R.id.dialog_song_artists);
-        TextView band = dialog.findViewById(R.id.dialog_song_band);
 
         Glide.with(this.context)
                 .asGif()
@@ -140,11 +139,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
                 .into(songPicture);
 
         songTitle.setText(song.getTitle());
-        likedBy.setText("Liked By: " + 13);
+        likedBy.setText("Liked By: " + song.getLikedBy());
         genre.setText("Genre: " + song.getGenre());
-        releaseDate.setText("Release Date: " + "June 2020");
-        artists.setText("Artist: " + song.getArtist());
-        band.setText("Band: " + "One Direction");
+        releaseDate.setText("Release Date: " + song.getReleaseDate());
+        artists.setText("Artist(s): " + song.getArtist());
 
         dialog.show();
     }

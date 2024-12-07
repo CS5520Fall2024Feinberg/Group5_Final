@@ -39,6 +39,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -203,8 +205,8 @@ public class HomeFragment extends Fragment {
                             artists.add(otherArtistName);
                         }
 
-                        SongDBModel newSong = new SongDBModel(songId, songTitle, uri.toString(), selectedGenre, artists);
 
+                        SongDBModel newSong = new SongDBModel(songId, songTitle, uri.toString(), selectedGenre, artists, getCurrentDate());
                         dialog.dismiss();
 
 
@@ -274,12 +276,14 @@ public class HomeFragment extends Fragment {
                                 new Song(
                                         songId,
                                         songdb.getTitle(),
-                                        "Unknown",
+                                        String.join(", ", songdb.getArtists()),
                                         songdb.getGenre(),
                                         false,
                                         false,
                                         0,
-                                        songdb.getUrl()
+                                        songdb.getUrl(),
+                                        13,
+                                        songdb.getReleaseDate()
                                 )
                         );
                     }
@@ -335,6 +339,12 @@ public class HomeFragment extends Fragment {
             return "Unknown Artist";
         }
         return artistName;
+    }
+
+    private String getCurrentDate() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM yyyy");
+        return currentDate.format(formatter);
     }
 
 }
