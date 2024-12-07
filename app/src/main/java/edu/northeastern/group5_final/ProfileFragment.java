@@ -32,6 +32,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +79,7 @@ public class ProfileFragment extends Fragment {
         username = view.findViewById(R.id.username);
         fullname = view.findViewById(R.id.full_name);
         joined = view.findViewById(R.id.member_since);
-
+        Toast.makeText(getContext(), "Logged In Successfully1", Toast.LENGTH_SHORT).show();
         fetchSelfUserData();
 
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
@@ -87,7 +89,7 @@ public class ProfileFragment extends Fragment {
 
         favoriteSongs = new ArrayList<>();
         populateFavoriteSongs();
-
+        Toast.makeText(getContext(), "Logged In Successfully2", Toast.LENGTH_SHORT).show();
         favoritesListRV = view.findViewById(R.id.favorites_list);
         favoritesListRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         favoritesAdapter = new FavoritesListAdapter(getContext(), favoriteSongs);
@@ -103,12 +105,12 @@ public class ProfileFragment extends Fragment {
 
         mySongs = new ArrayList<>();
         populateMySongs();
-
+        Toast.makeText(getContext(), "Logged In Successfully3", Toast.LENGTH_SHORT).show();
         mySongsListRV = view.findViewById(R.id.my_songs_list);
         mySongsListRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         mySongsAdapter = new MySongsListAdapter(getContext(), mySongs);
         mySongsListRV.setAdapter(mySongsAdapter);
-
+        Toast.makeText(getContext(), "Logged In Successfully4", Toast.LENGTH_SHORT).show();
 
         return view;
     }
@@ -182,12 +184,39 @@ public class ProfileFragment extends Fragment {
         fullname.setText(user.getName());
         joined.setText("Member since: " + user.getDateJoined());
 
-        Glide.with(getContext())
-                .load(user.getProfilePictureUrl().toString())
-                .placeholder(R.drawable.single_artist_icon)
-                .error(R.drawable.single_artist_icon)
-                .circleCrop()
-                .into(profileImage);
+        if (user.getProfilePictureUrl() != null) {
+            Log.d("ProfileFragment", "Profile picture URL is not null:" + user.getProfilePictureUrl());
+            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(user.getProfilePictureUrl());
+            storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                String downloadUrl = uri.toString();
+                Log.d("ProfileFragment", "Download URL: " + downloadUrl);
+
+                Glide.with(getContext())
+                        .load(downloadUrl)
+                        .placeholder(R.drawable.single_artist_icon)
+                        .error(R.drawable.single_artist_icon)
+                        .circleCrop()
+                        .into(profileImage);
+            }).addOnFailureListener(exception -> {// incase failure with connecting to db storage
+                Log.e("ProfileFragment", "Failed to get download URL", exception);
+
+                Glide.with(getContext())
+                        .load(R.drawable.single_artist_icon)
+                        .placeholder(R.drawable.single_artist_icon)
+                        .error(R.drawable.single_artist_icon)
+                        .circleCrop()
+                        .into(profileImage);
+            });
+        }
+        else{// incase user does not have a profile picture
+            Glide.with(getContext())
+                    .load(R.drawable.single_artist_icon)
+                    .placeholder(R.drawable.single_artist_icon)
+                    .error(R.drawable.single_artist_icon)
+                    .circleCrop()
+                    .into(profileImage);
+        }
+
 
     }
 
