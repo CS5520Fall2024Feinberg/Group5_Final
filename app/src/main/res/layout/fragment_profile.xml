@@ -73,13 +73,13 @@
                 android:text="Favorites"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginVertical="8dp"
                 android:paddingStart="8dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/favorites_list"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="130dp"
                 android:orientation="horizontal" />
 
             <TextView

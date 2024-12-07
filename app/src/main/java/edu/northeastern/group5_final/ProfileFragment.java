@@ -31,17 +31,22 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.northeastern.group5_final.adapters.CollaborationsListAdapter;
 import edu.northeastern.group5_final.adapters.FavoritesListAdapter;
+import edu.northeastern.group5_final.models.Collaboration;
 import edu.northeastern.group5_final.models.FavoriteSong;
+import edu.northeastern.group5_final.models.RequestDBModel;
 import edu.northeastern.group5_final.models.Song;
 import edu.northeastern.group5_final.models.SongDBModel;
 
 public class ProfileFragment extends Fragment {
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
-    private RecyclerView favoritesListRV;
-    private FavoritesListAdapter adapter;
+    private RecyclerView favoritesListRV, collaborationsListRV;
+    private FavoritesListAdapter favoritesAdapter;
+    private CollaborationsListAdapter collaborationsAdapter;
     private List<FavoriteSong> favoriteSongs;
+    private List<Collaboration> collaborations;
 
 
     @Override
@@ -54,19 +59,27 @@ public class ProfileFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_profile, container, false);
         Toolbar toolbar = view.findViewById(R.id.toolbar);
 
-        favoriteSongs = new ArrayList<>();
-        populateFavoriteSongs();
-
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle("Beat Connect");
 
         setHasOptionsMenu(true);
 
+        favoriteSongs = new ArrayList<>();
+        populateFavoriteSongs();
+
         favoritesListRV = view.findViewById(R.id.favorites_list);
         favoritesListRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        favoritesAdapter = new FavoritesListAdapter(getContext(), favoriteSongs);
+        favoritesListRV.setAdapter(favoritesAdapter);
 
-        adapter = new FavoritesListAdapter(getContext(), favoriteSongs);
-        favoritesListRV.setAdapter(adapter);
+        collaborations = new ArrayList<>();
+        populateCollaborations();
+
+        collaborationsListRV = view.findViewById(R.id.collabs_list);
+        collaborationsListRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        collaborationsAdapter = new CollaborationsListAdapter(getContext(), collaborations);
+        collaborationsListRV.setAdapter(collaborationsAdapter);
+
 
         return view;
     }
@@ -90,9 +103,8 @@ public class ProfileFragment extends Fragment {
                                     songdb.getReleaseDate()
                             )
                     );
-
                 }
-                adapter.notifyDataSetChanged();
+                favoritesAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -102,6 +114,45 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    private void populateCollaborations() {
+        collaborations.add(new Collaboration("Band A", "Artist X, Artist Y"));
+        collaborations.add(new Collaboration("Band B", "Artist Z"));
+        collaborations.add(new Collaboration("Band C", "Artist P, Artist Q"));
+
+
+
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("requests");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                collaborations.clear();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    RequestDBModel request = snapshot.getValue(RequestDBModel.class);
+
+                    if (request == null || request.getRequestorUsername() == null || request.getRecipientUsername() == null) continue;
+                    if (!request.getRequestorUsername().equals(currentUsername) && !request.getRecipientUsername().equals(currentUsername)) continue;
+
+                    collaborations.add(
+                            new Collaboration(
+                                    request.getBandName(),
+                                    request.getRequestorUsername() + ", " + request.getRecipientUsername()
+                            )
+                    );
+                }
+                collaborationsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Failed to fetch songs: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+    }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {

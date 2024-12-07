@@ -53,7 +53,7 @@ public class FavoritesListAdapter extends RecyclerView.Adapter<FavoritesListAdap
             super(itemView);
             title = itemView.findViewById(R.id.favorite_song_title);
             title.setSelected(true);
-            
+
             artistNames = itemView.findViewById(R.id.favorite_song_artist_names);
             releaseDate = itemView.findViewById(R.id.favorite_song_release_date);
         }
