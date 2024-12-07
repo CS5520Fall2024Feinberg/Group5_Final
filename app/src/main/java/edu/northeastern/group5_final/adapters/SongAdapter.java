@@ -25,7 +25,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -88,10 +96,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         });
 
 
-        holder.favoriteButton.setOnClickListener(v -> {
-            song.setFavorite(!song.isFavorite());
-            notifyItemChanged(position);
-        });
+        holder.favoriteButton.setOnClickListener(v -> favoriteBtnListener(song, position));
 
         if (position == currentlyPlayingIndex) {
             updateProgressBar(holder);
@@ -103,6 +108,78 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
 
     }
+
+    private void favoriteBtnListener(Song song, int position) {
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        if (currentUsername == null || currentUsername.isEmpty()) {
+            Toast.makeText(context, "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String songId = song.getId();
+        DatabaseReference songRef = FirebaseDatabase.getInstance().getReference("songs").child(songId).child("likedBy");
+        boolean isFavorite = song.isFavorite();
+
+        if (isFavorite) {
+            songRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    List<String> likedBy = new ArrayList<>();
+                    if (snapshot.exists()) {
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            String username = userSnapshot.getValue(String.class);
+                            if (username != null && !username.equals(currentUsername)) {
+                                likedBy.add(username);
+                            }
+                        }
+                    }
+
+                    songRef.setValue(likedBy)
+                            .addOnSuccessListener(aVoid -> {
+                                song.setFavorite(false);
+                                notifyItemChanged(position);
+                                Toast.makeText(context, "Removed from favorites", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> Toast.makeText(context, "Failed to update favorites", Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(context, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            songRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    List<String> likedBy = new ArrayList<>();
+                    if (snapshot.exists()) {
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            String username = userSnapshot.getValue(String.class);
+                            if (username != null) {
+                                likedBy.add(username);
+                            }
+                        }
+                    }
+                    likedBy.add(currentUsername);
+
+                    songRef.setValue(likedBy)
+                            .addOnSuccessListener(aVoid -> {
+                                song.setFavorite(true);
+                                notifyItemChanged(position);
+                                Toast.makeText(context, "Added to favorites", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> Toast.makeText(context, "Failed to update favorites", Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(context, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
 
     private void moreInfoListener(@NonNull SongViewHolder holder) {
 

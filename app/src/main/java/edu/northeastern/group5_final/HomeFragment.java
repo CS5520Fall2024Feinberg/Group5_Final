@@ -206,7 +206,15 @@ public class HomeFragment extends Fragment {
                         }
 
 
-                        SongDBModel newSong = new SongDBModel(songId, songTitle, uri.toString(), selectedGenre, artists, getCurrentDate());
+                        SongDBModel newSong = new SongDBModel(
+                                songId,
+                                songTitle,
+                                uri.toString(),
+                                selectedGenre,
+                                artists,
+                                getCurrentDate(),
+                                new ArrayList<>()
+                        );
                         dialog.dismiss();
 
 
@@ -262,6 +270,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void populateSongs() {
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("songs");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -279,10 +288,10 @@ public class HomeFragment extends Fragment {
                                         String.join(", ", songdb.getArtists()),
                                         songdb.getGenre(),
                                         false,
-                                        false,
+                                        songdb.getLikedBy() != null && songdb.getLikedBy().contains(currentUsername),
                                         0,
                                         songdb.getUrl(),
-                                        13,
+                                        songdb.getLikedBy() == null ? 0 : songdb.getLikedBy().size(),
                                         songdb.getReleaseDate()
                                 )
                         );

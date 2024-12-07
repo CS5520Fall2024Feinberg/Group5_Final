@@ -11,19 +11,21 @@ public class SongDBModel {
     private String url;
     private String genre;
     private String releaseDate;
+    private List<String> likedBy;
 
     @Exclude
     private List<String> artists;
 
     public SongDBModel() {}
 
-    public SongDBModel(String id, String title, String url, String genre, List<String> artists, String releaseDate) {
+    public SongDBModel(String id, String title, String url, String genre, List<String> artists, String releaseDate, List<String> likedBy) {
         this.id = id;
         this.title = title;
         this.url = url;
         this.genre = genre;
         this.artists = artists;
         this.releaseDate = releaseDate;
+        this.likedBy = likedBy;
     }
 
     public String getGenre() {
@@ -72,5 +74,13 @@ public class SongDBModel {
 
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
+    }
+
+    public List<String> getLikedBy() {
+        return likedBy;
+    }
+
+    public void setLikedBy(List<String> likedBy) {
+        this.likedBy = likedBy;
     }
 }
