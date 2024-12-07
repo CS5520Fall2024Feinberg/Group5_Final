@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    implementation("com.github.bumptech.glide:glide:4.15.1")
     implementation(libs.material.v190)
     implementation(libs.material.v100)
     implementation(libs.appcompat)

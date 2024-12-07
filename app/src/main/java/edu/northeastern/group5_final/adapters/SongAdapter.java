@@ -1,14 +1,21 @@
 package edu.northeastern.group5_final.adapters;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,9 +23,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
+import java.util.Random;
 
 import edu.northeastern.group5_final.MyMediaPlayer;
 import edu.northeastern.group5_final.R;
@@ -89,6 +98,69 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         } else {
             holder.progressBar.setProgress(0);
         }
+
+        holder.songInfo.setOnClickListener(v -> moreInfoListener(holder));
+
+
+    }
+
+    private void moreInfoListener(@NonNull SongViewHolder holder) {
+
+        int position = holder.getAdapterPosition();
+        Song song = songs.get(position);
+
+        Context context = holder.itemView.getContext();
+
+        Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_song_profile);
+        dialog.show();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.gravity = Gravity.CENTER;
+            params.y = -200;
+            window.setAttributes(params);
+
+        }
+
+        ImageView songPicture = dialog.findViewById(R.id.dialog_song_picture);
+        TextView songTitle = dialog.findViewById(R.id.dialog_song_title);
+        TextView likedBy = dialog.findViewById(R.id.dialog_song_liked_by);
+        TextView genre = dialog.findViewById(R.id.dialog_song_genre);
+        TextView releaseDate = dialog.findViewById(R.id.dialog_song_release_date);
+        TextView artists = dialog.findViewById(R.id.dialog_song_artists);
+        TextView band = dialog.findViewById(R.id.dialog_song_band);
+
+        Glide.with(this.context)
+                .asGif()
+                .load(getGifUrl())
+                .placeholder(R.drawable.song_info)
+                .into(songPicture);
+
+        songTitle.setText(song.getTitle());
+        likedBy.setText("Liked By: " + 13);
+        genre.setText("Genre: " + song.getGenre());
+        releaseDate.setText("Release Date: " + "June 2020");
+        artists.setText("Artist: " + song.getArtist());
+        band.setText("Band: " + "One Direction");
+
+        dialog.show();
+    }
+
+    private String getGifUrl() {
+        String[] urls = {
+                "https://media.tenor.com/dmb-UuLw7w4AAAAi/milk-and.gif",
+                "https://media.tenor.com/IZH_k7F9aqcAAAAj/music.gif",
+                "https://c.tenor.com/9SFSfC2n0lkAAAAd/tenor.gif",
+                "https://media.tenor.com/_8P584En7EcAAAAi/ukulele-music.gif",
+                "https://media.tenor.com/3mYA38cHUbsAAAAi/music-sheet-song.gif"
+        };
+
+        Random random = new Random();
+        int randomIndex = random.nextInt(urls.length);
+        return urls[randomIndex];
     }
 
     @Override
@@ -97,7 +169,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     }
 
     static class SongViewHolder extends RecyclerView.ViewHolder {
-        TextView songTitle, songArtist, songGenre;
+        TextView songTitle, songArtist, songGenre, songInfo;
         ImageButton playPauseButton, favoriteButton;
         ProgressBar progressBar;
         MaterialCardView card;
@@ -113,6 +185,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             favoriteButton = itemView.findViewById(R.id.btn_favorite);
             progressBar = itemView.findViewById(R.id.song_progress_bar);
             btnAddSong = itemView.findViewById(R.id.btn_add_song);
+            songInfo = itemView.findViewById(R.id.song_more_info);
+
+            songInfo.setText(Html.fromHtml("<u>More Info</u>"));
+            songTitle.setSelected(true);
         }
     }
 

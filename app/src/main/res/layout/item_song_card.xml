@@ -47,19 +47,25 @@
 
                 <TextView
                     android:id="@+id/song_title"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
+                    android:layout_marginBottom="3dp"
                     android:text="Song Title"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true" />
 
                 <TextView
                     android:id="@+id/song_artist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
+                    android:layout_marginBottom="3dp"
                     android:text="Artist Name"
                     android:textColor="#666666"
                     android:textSize="14sp" />
@@ -71,6 +77,17 @@
                     android:text="Genre"
                     android:textColor="#666666"
                     android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/song_more_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="More Info"
+                    android:textColor="#B87333"
+                    android:textSize="14sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
 
             </LinearLayout>
 
