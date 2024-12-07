@@ -2,6 +2,7 @@ package edu.northeastern.group5_final;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,6 +21,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import edu.northeastern.group5_final.models.ArtistDBModel;
+import edu.northeastern.group5_final.utils.SharedPreferenceManager;
+import edu.northeastern.group5_final.utils.Utils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,6 +81,19 @@ public class MainActivity extends AppCompatActivity {
                                     firebaseAuth.signInWithEmailAndPassword(storedEmail, password)
                                         .addOnCompleteListener(task -> {
                                             if (task.isSuccessful()) {
+                                                Utils.fetchSelfUserData(MainActivity.this, new Utils.UserCallback() {
+                                                    @Override
+                                                    public void onSuccess(ArtistDBModel selfUser) {
+                                                        Log.d("TAG", "onSuccess: " + selfUser.getRole());
+                                                        SharedPreferenceManager.saveUserRole(MainActivity.this, selfUser.getRole());
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(String errorMessage) {
+                                                        Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
                                                 Intent intent = new Intent(MainActivity.this, Dashboard.class);
                                                 intent.putExtra("username", username);
                                                 startActivity(intent);

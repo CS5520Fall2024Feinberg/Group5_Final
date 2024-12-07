@@ -9,6 +9,7 @@ import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -49,6 +50,9 @@ public class Signup extends AppCompatActivity {
     Uri profilePictureUri;
     FirebaseDatabase database;
     DatabaseReference artistsRef;
+    RadioGroup radioGroup;
+    String role;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,19 @@ public class Signup extends AppCompatActivity {
         etxtEmail = findViewById(R.id.et_email);
         etxtPassword = findViewById(R.id.et_password);
         etxtRePassword = findViewById(R.id.et_reenter_password);
+
+        radioGroup = findViewById(R.id.rg_artist_band);
+        radioGroup = findViewById(R.id.rg_artist_band);
+        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.rb_yes) {
+                role = "ARTIST";
+            } else if (checkedId == R.id.rb_no) {
+                role = "LISTENER";
+            }
+            Log.d("TAG", "onCreate: " + role);
+        });
+
+
 
         Button btnSignup = findViewById(R.id.btn_sign_up);
         btnSignup.setOnClickListener(view -> signUp());
@@ -164,6 +181,7 @@ public class Signup extends AppCompatActivity {
         userData.put("password", password);
         userData.put("dateJoined", getCurrentDate());
         userData.put("bio", "");
+        userData.put("role", role);
 
         if (profilePictureUrl != null) {
             userData.put("profilePictureUrl", profilePictureUrl);
@@ -199,10 +217,6 @@ public class Signup extends AppCompatActivity {
                         Toast.makeText(Signup.this, "Sign-up failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
-
-
-
     }
 
     private boolean isValidEmail(String email) {

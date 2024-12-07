@@ -83,13 +83,13 @@
             android:textColor="@color/black"
             android:textColorHint="@color/darkgray"
             android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:id="@+id/tv_are_you_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Are you an artist or a band?"
+            android:text="Define Your Groove"
             android:textSize="16sp"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
@@ -99,13 +99,14 @@
             android:id="@+id/rg_artist_band"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:checkedButton="@id/rb_yes">
 
             <RadioButton
                 android:id="@+id/rb_yes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Yes"
+                android:text="🎹 Music Maker (Artist)"
                 android:textColor="@color/black"
                 android:layout_marginEnd="16dp" />
 
@@ -114,7 +115,7 @@
                 android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="No" />
+                android:text="🎧 Music Lover (Listener)" />
         </RadioGroup>
 
         <Button

@@ -14,6 +14,7 @@ public class ArtistDBModel {
     private String dateJoined;
     private String profilePictureUrl;
     private String bio;
+    private String role;
     private Map<String,String> requestsSent = new HashMap<>();
 
     @Exclude
@@ -76,5 +77,13 @@ public class ArtistDBModel {
 
     public void setRequestsSent(Map<String, String> requestsSent) {
         this.requestsSent = requestsSent;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

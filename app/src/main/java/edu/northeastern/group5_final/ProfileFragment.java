@@ -79,7 +79,6 @@ public class ProfileFragment extends Fragment {
         username = view.findViewById(R.id.username);
         fullname = view.findViewById(R.id.full_name);
         joined = view.findViewById(R.id.member_since);
-        Toast.makeText(getContext(), "Logged In Successfully1", Toast.LENGTH_SHORT).show();
         fetchSelfUserData();
 
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
@@ -89,7 +88,6 @@ public class ProfileFragment extends Fragment {
 
         favoriteSongs = new ArrayList<>();
         populateFavoriteSongs();
-        Toast.makeText(getContext(), "Logged In Successfully2", Toast.LENGTH_SHORT).show();
         favoritesListRV = view.findViewById(R.id.favorites_list);
         favoritesListRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         favoritesAdapter = new FavoritesListAdapter(getContext(), favoriteSongs);
@@ -105,12 +103,10 @@ public class ProfileFragment extends Fragment {
 
         mySongs = new ArrayList<>();
         populateMySongs();
-        Toast.makeText(getContext(), "Logged In Successfully3", Toast.LENGTH_SHORT).show();
         mySongsListRV = view.findViewById(R.id.my_songs_list);
         mySongsListRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         mySongsAdapter = new MySongsListAdapter(getContext(), mySongs);
         mySongsListRV.setAdapter(mySongsAdapter);
-        Toast.makeText(getContext(), "Logged In Successfully4", Toast.LENGTH_SHORT).show();
 
         return view;
     }
