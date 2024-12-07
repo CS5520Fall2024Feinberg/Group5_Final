@@ -2,7 +2,9 @@ package edu.northeastern.group5_final;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,6 +38,8 @@ import java.util.List;
 
 import edu.northeastern.group5_final.adapters.CollaborationsListAdapter;
 import edu.northeastern.group5_final.adapters.FavoritesListAdapter;
+import edu.northeastern.group5_final.models.Artist;
+import edu.northeastern.group5_final.models.ArtistDBModel;
 import edu.northeastern.group5_final.models.Collaboration;
 import edu.northeastern.group5_final.models.FavoriteSong;
 import edu.northeastern.group5_final.models.RequestDBModel;
@@ -42,6 +49,8 @@ import edu.northeastern.group5_final.models.SongDBModel;
 public class ProfileFragment extends Fragment {
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
+    private TextView username, fullname, joined;
+    private ImageView profileImage;
     private RecyclerView favoritesListRV, collaborationsListRV;
     private FavoritesListAdapter favoritesAdapter;
     private CollaborationsListAdapter collaborationsAdapter;
@@ -58,6 +67,13 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_profile, container, false);
         Toolbar toolbar = view.findViewById(R.id.toolbar);
+
+        profileImage = view.findViewById(R.id.profile_image);
+        username = view.findViewById(R.id.username);
+        fullname = view.findViewById(R.id.full_name);
+        joined = view.findViewById(R.id.member_since);
+
+        fetchSelfUserData();
 
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) requireActivity()).getSupportActionBar().setTitle("Beat Connect");
@@ -80,9 +96,53 @@ public class ProfileFragment extends Fragment {
         collaborationsAdapter = new CollaborationsListAdapter(getContext(), collaborations);
         collaborationsListRV.setAdapter(collaborationsAdapter);
 
-
         return view;
     }
+
+    private void fetchSelfUserData() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("artists");
+        databaseReference.orderByChild("username").equalTo(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    ArtistDBModel selfUser = dataSnapshot.getValue(ArtistDBModel.class);
+                    if (selfUser != null) {
+                        for (DataSnapshot selfSnapshot : dataSnapshot.getChildren()) {
+                            selfUser = selfSnapshot.getValue(ArtistDBModel.class);
+                            if (selfUser != null) break;
+                        }
+                        updateUI(selfUser);
+                    } else {
+                        Toast.makeText(getContext(), "Failed to parse user data", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "User data not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Error fetching data: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void updateUI(ArtistDBModel user) {
+        username.setText("@" + user.getUsername());
+        fullname.setText(user.getName());
+        joined.setText("Member since: " + user.getDateJoined());
+
+        Glide.with(getContext())
+                .load(user.getProfilePictureUrl().toString())
+                .placeholder(R.drawable.single_artist_icon)
+                .error(R.drawable.single_artist_icon)
+                .circleCrop()
+                .into(profileImage);
+
+    }
+
 
     private void populateFavoriteSongs() {
         String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
