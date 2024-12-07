@@ -49,6 +49,7 @@ import edu.northeastern.group5_final.models.MySong;
 import edu.northeastern.group5_final.models.RequestDBModel;
 import edu.northeastern.group5_final.models.Song;
 import edu.northeastern.group5_final.models.SongDBModel;
+import edu.northeastern.group5_final.utils.SharedPreferenceManager;
 
 public class ProfileFragment extends Fragment {
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -75,6 +76,10 @@ public class ProfileFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_profile, container, false);
         Toolbar toolbar = view.findViewById(R.id.toolbar);
 
+        String userRole = SharedPreferenceManager.getUserRole(getContext());
+        boolean isArtist = userRole.equals("ARTIST");
+
+
         profileImage = view.findViewById(R.id.profile_image);
         username = view.findViewById(R.id.username);
         fullname = view.findViewById(R.id.full_name);
@@ -97,6 +102,7 @@ public class ProfileFragment extends Fragment {
         populateCollaborations();
 
         collaborationsListRV = view.findViewById(R.id.collabs_list);
+        collaborationsListRV.setVisibility(isArtist ? View.VISIBLE : View.GONE);
         collaborationsListRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         collaborationsAdapter = new CollaborationsListAdapter(getContext(), collaborations);
         collaborationsListRV.setAdapter(collaborationsAdapter);
@@ -104,9 +110,13 @@ public class ProfileFragment extends Fragment {
         mySongs = new ArrayList<>();
         populateMySongs();
         mySongsListRV = view.findViewById(R.id.my_songs_list);
+        mySongsListRV.setVisibility(isArtist ? View.VISIBLE : View.GONE);
         mySongsListRV.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         mySongsAdapter = new MySongsListAdapter(getContext(), mySongs);
         mySongsListRV.setAdapter(mySongsAdapter);
+
+        view.findViewById(R.id.my_songs_label).setVisibility(isArtist ? View.VISIBLE : View.GONE);
+        view.findViewById(R.id.collabs_label).setVisibility(isArtist ? View.VISIBLE : View.GONE);
 
         return view;
     }

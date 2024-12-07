@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (firebaseAuth.getCurrentUser() != null) {
             startActivity(new Intent(this, Dashboard.class));
+            setUserRole();
             finish();
             return;
         }
@@ -51,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
         EditText etxtUsername = findViewById(R.id.et_username);
         EditText etxtPassword = findViewById(R.id.et_password);
-
 
         Button btnLogin = findViewById(R.id.btn_sign_in);
         btnLogin.setOnClickListener(view -> {
@@ -125,6 +125,21 @@ public class MainActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+    }
+
+    private void setUserRole() {
+        Utils.fetchSelfUserData(MainActivity.this, new Utils.UserCallback() {
+            @Override
+            public void onSuccess(ArtistDBModel selfUser) {
+                Log.d("TAG", "Updated: " + selfUser.getRole());
+                SharedPreferenceManager.saveUserRole(MainActivity.this, selfUser.getRole());
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

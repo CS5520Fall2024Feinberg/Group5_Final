@@ -38,6 +38,7 @@ import edu.northeastern.group5_final.models.ArtistDBModel;
 import edu.northeastern.group5_final.models.Request;
 import edu.northeastern.group5_final.models.RequestDBModel;
 import edu.northeastern.group5_final.models.Song;
+import edu.northeastern.group5_final.utils.SharedPreferenceManager;
 
 public class CollabFragment extends Fragment {
 
@@ -63,6 +64,9 @@ public class CollabFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        String userRole = SharedPreferenceManager.getUserRole(getContext());
+        boolean isArtist = userRole.equals("ARTIST");
+
         populateArtists();
         populateRequests();
 
@@ -77,6 +81,7 @@ public class CollabFragment extends Fragment {
         initializeRequestAdapter();
 
         toggleBtn = view.findViewById(R.id.toggle_btn);
+        toggleBtn.setVisibility(isArtist ? View.VISIBLE : View.GONE);
         toggleBtn.setOnClickListener(v -> {
 
             if (toggleBtn.getText().equals("My Collab Requests")) {

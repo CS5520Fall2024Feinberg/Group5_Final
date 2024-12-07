@@ -51,6 +51,7 @@ import edu.northeastern.group5_final.adapters.SongAdapter;
 import edu.northeastern.group5_final.models.RequestDBModel;
 import edu.northeastern.group5_final.models.Song;
 import edu.northeastern.group5_final.models.SongDBModel;
+import edu.northeastern.group5_final.utils.SharedPreferenceManager;
 
 
 public class HomeFragment extends Fragment {
@@ -69,6 +70,8 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        String userRole = SharedPreferenceManager.getUserRole(getContext());
+        boolean isArtist = userRole.equals("ARTIST");
 
         populateSongs(filterStateFav, filterStateMine);
         fetchCurrentUserCollabirations();
@@ -81,12 +84,15 @@ public class HomeFragment extends Fragment {
 
         publishFilterBtn = view.findViewById(R.id.publish_filter_btn);
         publishFilterBtn.setOnClickListener(v -> filterListByMine());
+        publishFilterBtn.setVisibility(isArtist ? View.VISIBLE : View.GONE);
 
         adapter = new SongAdapter(getContext(), songList);
         recyclerView.setAdapter(adapter);
 
         FloatingActionButton fab = view.findViewById(R.id.add_song_btn);
         fab.setOnClickListener(v -> openAddSongDialog());
+        fab.setVisibility(isArtist ? View.VISIBLE : View.GONE);
+
 
         return view;
     }

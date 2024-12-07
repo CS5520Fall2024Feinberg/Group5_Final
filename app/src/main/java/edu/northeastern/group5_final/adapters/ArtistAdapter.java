@@ -1,5 +1,7 @@
 package edu.northeastern.group5_final.adapters;
 
+import static java.security.AccessController.getContext;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
@@ -36,12 +38,14 @@ import java.util.Map;
 
 import edu.northeastern.group5_final.R;
 import edu.northeastern.group5_final.models.Artist;
+import edu.northeastern.group5_final.utils.SharedPreferenceManager;
 
 public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistViewHolder> {
 
     private final Context context;
     private final List<Artist> artistList;
     private final Map<String, Artist.Status> localStatusMap;
+    private boolean isArtist;
 
     public ArtistAdapter(Context context, List<Artist> artistList, Map<String, Artist.Status> localStatusMap) {
         this.context = context;
@@ -57,6 +61,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
     @Override
     public ArtistViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.search_recycler_view_row, parent, false);
+        String userRole = SharedPreferenceManager.getUserRole(this.context);
+        isArtist = userRole.equals("ARTIST");
         return new ArtistViewHolder(view);
     }
 
@@ -68,21 +74,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
         holder.albumsReleased.setText("Albums: " + artist.getTotalSongsReleased());
         holder.joinDate.setText("Joined: " + artist.getJoinedDate());
 
-        //not sure if we need this
-        /*
-        if (artist.getProfilePicture() != null) {
-            holder.artistPicture.setImageURI(artist.getProfilePicture());
-        } else {
-            holder.artistPicture.setImageResource(artist.getIsIndividual() ? R.drawable.single_artist_icon : R.drawable.artists_group_icon);
-        }
-
-         */
-
-        //setting profile picture
-        //String Url = "gs://cs5520-group5-final.firebasestorage.app/profile_pictures/" + artist.getUsername() + ".jpg";
         if (artist.getProfilePicture() != null) {
             String Url = artist.getProfilePicture().toString();
-            //Log.e("URL", "URL of image: : " + Url2);
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageReference = storage.getReferenceFromUrl(Url);
             storageReference.getDownloadUrl()
@@ -98,8 +91,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
                         holder.artistPicture.setImageResource(R.drawable.single_artist_icon); // Fallback image
                     });
         }
-        else {//when they dont have a profile picture
-            //Log.e("URL", "URL of image is null: " + artist.getUsername());
+        else {
             holder.artistPicture.setImageResource(R.drawable.single_artist_icon);
         }
 
@@ -115,6 +107,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistView
                 break;
         }
 
+        holder.sendRequestButton.setVisibility(isArtist ? View.VISIBLE : View.GONE);
         holder.sendRequestButton.setOnClickListener(v -> {
             if (artist.getStatus() == Artist.Status.PLUS) {
                 showRequestDialog(artist, position);
