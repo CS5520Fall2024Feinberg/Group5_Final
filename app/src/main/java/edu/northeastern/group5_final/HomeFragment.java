@@ -98,6 +98,18 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        adapter.stopSong();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        adapter.stopSong();
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 

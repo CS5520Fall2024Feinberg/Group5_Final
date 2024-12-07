@@ -320,6 +320,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         }
     }
 
+    public void stopSong() {
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
+    }
+
 
     private void updateProgressBar(SongViewHolder holder) {
         if (mediaPlayer == null) {
