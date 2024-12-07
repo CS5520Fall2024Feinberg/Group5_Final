@@ -5,6 +5,7 @@ import static android.app.Activity.RESULT_OK;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,16 +62,25 @@ public class HomeFragment extends Fragment {
     private Uri selectedFileUri;
     List<RequestDBModel> userRequests = new ArrayList<>();
     private RequestDBModel selectedArtist;
+    private Boolean filterStateFav = false;
+    private Boolean filterStateMine = false;
+    private Button favFilterBtn, publishFilterBtn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        populateSongs();
+        populateSongs(filterStateFav, filterStateMine);
         fetchCurrentUserCollabirations();
 
         RecyclerView recyclerView = view.findViewById(R.id.song_list_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        favFilterBtn = view.findViewById(R.id.favorite_filter_btn);
+        favFilterBtn.setOnClickListener(v -> filterListByFav());
+
+        publishFilterBtn = view.findViewById(R.id.publish_filter_btn);
+        publishFilterBtn.setOnClickListener(v -> filterListByMine());
 
         adapter = new SongAdapter(getContext(), songList);
         recyclerView.setAdapter(adapter);
@@ -106,6 +117,21 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    private void filterListByFav() {
+        int color = ContextCompat.getColor(getContext(), !filterStateFav ? R.color.green : R.color.darkgray);
+
+        favFilterBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+        populateSongs(!filterStateFav, filterStateMine);
+        filterStateFav = !filterStateFav;
+    }
+
+    private void filterListByMine() {
+        int color = ContextCompat.getColor(getContext(), !filterStateMine ? R.color.green : R.color.darkgray);
+
+        publishFilterBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+        populateSongs(filterStateFav, !filterStateMine);
+        filterStateMine = !filterStateMine;
+    }
 
     private void openAddSongDialog() {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_file_picker, null);
@@ -269,7 +295,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void populateSongs() {
+    private void populateSongs(Boolean filter1, Boolean filter2) {
         String currentUsername = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("songs");
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -280,23 +306,35 @@ public class HomeFragment extends Fragment {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String songId = snapshot.getKey();
                     SongDBModel songdb = snapshot.getValue(SongDBModel.class);
-                    if (songdb != null) {
-                        songList.add(
-                                new Song(
-                                        songId,
-                                        songdb.getTitle(),
-                                        String.join(", ", songdb.getArtists()),
-                                        songdb.getGenre(),
-                                        false,
-                                        songdb.getLikedBy() != null && songdb.getLikedBy().contains(currentUsername),
-                                        0,
-                                        songdb.getUrl(),
-                                        songdb.getLikedBy() == null ? 0 : songdb.getLikedBy().size(),
-                                        songdb.getReleaseDate()
-                                )
-                        );
+
+                    if (songdb == null) continue;
+
+                    boolean isFavorite = songdb.getLikedBy() != null && songdb.getLikedBy().contains(currentUsername);
+                    boolean isMine = songdb.getArtists() != null && songdb.getArtists().contains(currentUsername);
+
+                    if ((filter1 && !filter2 && !isFavorite) ||
+                            (!filter1 && filter2 && !isMine) ||
+                            (filter1 && filter2 && (!isFavorite || !isMine))) {
+                        continue;
                     }
+
+                    songList.add(
+                            new Song(
+                                    songId,
+                                    songdb.getTitle(),
+                                    String.join(", ", songdb.getArtists()),
+                                    songdb.getGenre(),
+                                    false,
+                                    isFavorite,
+                                    0,
+                                    songdb.getUrl(),
+                                    songdb.getLikedBy() == null ? 0 : songdb.getLikedBy().size(),
+                                    songdb.getReleaseDate()
+                            )
+                    );
                 }
+
+
                 adapter.notifyDataSetChanged();
             }
 
