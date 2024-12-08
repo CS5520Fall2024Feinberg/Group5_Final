@@ -42,10 +42,6 @@ public class PlayActivity extends AppCompatActivity implements MyMediaPlayer.Cal
             MyMediaPlayer.getInstance(this).next();
         });
 
-        findViewById(R.id.play_stop_btn).setOnClickListener(v -> {
-            MyMediaPlayer.getInstance(this).stop();
-        });
-
         play_or_pause_btn = findViewById(R.id.play_or_pause_btn);
 
         try {

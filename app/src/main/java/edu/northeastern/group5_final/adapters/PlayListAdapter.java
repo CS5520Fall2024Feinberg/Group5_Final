@@ -4,10 +4,13 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -19,6 +22,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.SongVi
 
     private final List<Song> songs;
     private final Context context;
+
 
     public PlayListAdapter(Context context, List<Song> songs) {
         this.context = context;
@@ -38,16 +42,21 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.SongVi
         Song song = songs.get(position);
         holder.songTitle.setText(song.getTitle());
         holder.songArtist.setText(song.getArtist());
+
         if (p == MyMediaPlayer.getInstance(context).getCurrent() && MyMediaPlayer.getInstance(context).isPlaying()) {
-            holder.tvType.setText("playing");
+            Glide.with(context)
+                    .asGif()
+                    .load(R.drawable.song_playing)
+                    .placeholder(R.drawable.music)
+                    .into(holder.imvIsplaying);
+
         } else {
-            holder.tvType.setText("");
+            Glide.with(context)
+                    .asGif()
+                    .load(R.drawable.music)
+                    .placeholder(R.drawable.music)
+                    .into(holder.imvIsplaying);
         }
-        holder.itemView.setOnClickListener(v -> {
-            Song s = songs.get(p);
-            MyMediaPlayer.getInstance(context).play(s);
-            notifyDataSetChanged();
-        });
     }
 
     @Override
@@ -56,12 +65,16 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.SongVi
     }
 
     static class SongViewHolder extends RecyclerView.ViewHolder {
-        TextView songTitle, songArtist, tvType;
+
+        private TextView songTitle, songArtist, tvType;
+        private ImageView imvIsplaying;
+
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);
             songTitle = itemView.findViewById(R.id.song_title);
             songArtist = itemView.findViewById(R.id.song_artist);
-            tvType = itemView.findViewById(R.id.tv_type);
+            imvIsplaying = itemView.findViewById(R.id.icon_isplaying);
+
         }
     }
 }

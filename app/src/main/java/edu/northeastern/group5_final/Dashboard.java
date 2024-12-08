@@ -39,14 +39,14 @@ public class Dashboard extends AppCompatActivity {
             return true;
         });
 
-        findViewById(R.id.playList).setOnClickListener(v -> {
-            startActivity(new Intent(Dashboard.this,
-                    PlayListActivity.class));
-        });
-
-        findViewById(R.id.play).setOnClickListener(v -> {
-            startActivity(new Intent(Dashboard.this,
-                    PlayActivity.class));
-        });
+//        findViewById(R.id.playList).setOnClickListener(v -> {
+//            startActivity(new Intent(Dashboard.this,
+//                    PlayListActivity.class));
+//        });
+//
+//        findViewById(R.id.play).setOnClickListener(v -> {
+//            startActivity(new Intent(Dashboard.this,
+//                    PlayActivity.class));
+//        });
     }
 }

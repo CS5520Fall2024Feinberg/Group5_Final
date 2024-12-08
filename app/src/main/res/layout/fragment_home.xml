@@ -14,23 +14,6 @@
         android:clipToPadding="false"
         android:paddingBottom="350dp" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_song_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="26dp"
-        android:background="@null"
-        android:backgroundTint="@color/white"
-        android:clickable="true"
-        android:elevation="100dp"
-        android:focusable="true"
-        android:src="@drawable/add_song_3"
-        app:fabCustomSize="70dp"
-        app:maxImageSize="60dp"
-        app:tint="@null" />
-
-    <!-- Buttons container -->
     <LinearLayout
         android:id="@+id/button_container"
         android:layout_width="match_parent"
@@ -86,5 +69,55 @@
 
 
     </LinearLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_song_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="26dp"
+        android:background="@null"
+        android:backgroundTint="@color/white"
+        android:clickable="true"
+        android:elevation="100dp"
+        android:focusable="true"
+        android:src="@drawable/add_song_3"
+        app:fabCustomSize="70dp"
+        app:maxImageSize="60dp"
+        app:tint="@null" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_playlist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="26dp"
+        android:background="@null"
+        android:backgroundTint="@color/white"
+        android:clickable="true"
+        android:elevation="100dp"
+        android:focusable="true"
+        android:src="@drawable/playlist"
+        app:fabCustomSize="70dp"
+        app:maxImageSize="45dp"
+        app:tint="@null" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_player"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="26dp"
+        android:background="@null"
+        android:backgroundTint="@color/white"
+        android:clickable="true"
+        android:elevation="100dp"
+        android:focusable="true"
+        android:src="@drawable/player"
+        app:fabCustomSize="70dp"
+        app:maxImageSize="50dp"
+        app:tint="@null" />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

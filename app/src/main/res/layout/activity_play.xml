@@ -2,111 +2,125 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cardview_dark_background"
-    android:gravity="center_horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#121212"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <Button
-        android:id="@+id/quit_btn"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="left"
-        android:background="@drawable/baseline_arrow_back_ios_24"
-        android:backgroundTint="@color/white" />
-
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4">
+        android:layout_weight="3"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/siv_icon"
-            android:layout_width="260dp"
-            android:layout_height="260dp"
-            android:layout_centerInParent="true"
-            android:src="@drawable/signin_image" />
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/signin_image"
+            android:background="@drawable/circle_border" />
+    </LinearLayout>
 
-    </RelativeLayout>
-
-    <RelativeLayout
+    <!-- Song Info Section -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingVertical="16dp">
 
         <TextView
             android:id="@+id/text_view_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
             android:text="Current Song"
             android:textColor="#FFFFFF"
-            android:textSize="26dp" />
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/text_view_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/text_view_name"
-            android:layout_centerHorizontal="true"
-            android:text="Creater "
-            android:textColor="#FFFFFF"
-            android:textSize="20dp" />
+            android:text="Creator"
+            android:textColor="#B3B3B3"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
 
-    </RelativeLayout>
-
+    <!-- SeekBar Section -->
     <LinearLayout
         android:id="@+id/layout_progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingVertical="8dp"
+        android:orientation="vertical">
 
         <SeekBar
             android:id="@+id/seek_bar"
             style="@style/Widget.AppCompat.SeekBar"
             android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:max="100" />
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progressTint="#1DB954"
+            android:thumbTint="#1DB954" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="4dp"/>
     </LinearLayout>
 
+    <!-- Playback Controls -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_marginTop="24dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:showDividers="middle">
+        android:orientation="horizontal">
 
-        <Button
+        <ImageButton
             android:id="@+id/play_last_btn"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/baseline_skip_previous_24" />
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:src="@drawable/baseline_skip_previous_24"
+            app:tint="#FFFFFF" />
 
-        <Button
+        <ImageButton
             android:id="@+id/play_or_pause_btn"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:background="@drawable/baseline_play_arrow_24"
-            android:gravity="center" />
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/circle_button_background"
+            android:backgroundTint="@color/white"
+            app:tint="#FFFFFF" />
 
-        <Button
+        <ImageButton
             android:id="@+id/play_next_btn"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="16dp"
-            android:background="@drawable/baseline_skip_next_24" />
-
-        <Button
-            android:id="@+id/play_stop_btn"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="16dp"
-            android:background="@drawable/baseline_stop_24" />
-
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:src="@drawable/baseline_skip_next_24"
+            app:tint="#FFFFFF" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/quit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:text="Goo back!"
+        android:backgroundTint="@color/black"
+        android:textColor="#FFFFFF"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="8dp"
+        android:textStyle="bold" />
 </LinearLayout>

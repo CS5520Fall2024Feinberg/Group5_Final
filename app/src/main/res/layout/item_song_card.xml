@@ -93,10 +93,13 @@
 
             <ImageView
                 android:id="@+id/btn_add_song"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@null"
-                android:src="@drawable/add_song" />
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginHorizontal="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/add_playlist"
+                android:clickable="true"/>
+
 
             <ImageButton
                 android:id="@+id/btn_favorite"

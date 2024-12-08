@@ -93,6 +93,24 @@ public class HomeFragment extends Fragment {
         fab.setOnClickListener(v -> openAddSongDialog());
         fab.setVisibility(isArtist ? View.VISIBLE : View.GONE);
 
+        List<Song> playList = MyMediaPlayer.getInstance(getContext()).getPlayList();
+
+        FloatingActionButton fabPlaylist = view.findViewById(R.id.fab_playlist);
+        fabPlaylist.setOnClickListener(v -> {
+            startActivity(new Intent(getContext(),
+                    PlayListActivity.class));
+        });
+
+        FloatingActionButton fabPlayer = view.findViewById(R.id.fab_player);
+        fabPlayer.setOnClickListener(v -> {
+            if (playList.isEmpty()) {
+                Toast.makeText(getContext(), "Please add song to playlist first.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            startActivity(new Intent(getContext(),
+                    PlayActivity.class));
+        });
+
 
         return view;
     }

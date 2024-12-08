@@ -3,6 +3,7 @@ package edu.northeastern.group5_final.adapters;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
@@ -77,10 +78,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             List<Song> playList = MyMediaPlayer.getInstance(context).getPlayList();
             if (!playList.contains(song)){
                 MyMediaPlayer.getInstance(context).addSong(song);
-                Toast.makeText(context, context.getString(R.string.add) + song.getTitle() + context.getString(R.string.to_play_list), Toast.LENGTH_SHORT).show();
+                holder.btnAddSong.setImageResource(R.drawable.added);
             }else {
-                Toast.makeText(context, song.getTitle() + context.getString(R.string.exits_play_list), Toast.LENGTH_SHORT).show();
+                MyMediaPlayer.getInstance(context).removeSong(song);
+                holder.btnAddSong.setImageResource(R.drawable.add_playlist);
             }
+            Log.d("TAG", "onBindViewHolder: " + playList.size());
         });
 
         holder.playPauseButton.setImageResource(song.isPlaying() ? R.drawable.pauset : R.drawable.playt);
@@ -248,7 +251,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         ImageButton playPauseButton, favoriteButton;
         ProgressBar progressBar;
         MaterialCardView card;
-        View btnAddSong;
+        ImageView btnAddSong;
 
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);
