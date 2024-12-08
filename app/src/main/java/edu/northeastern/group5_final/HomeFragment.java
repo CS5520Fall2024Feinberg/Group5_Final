@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -66,6 +67,7 @@ public class HomeFragment extends Fragment {
     private Boolean filterStateFav = false;
     private Boolean filterStateMine = false;
     private Button favFilterBtn, publishFilterBtn;
+    private TextView songPlayingMsg;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -86,14 +88,14 @@ public class HomeFragment extends Fragment {
         publishFilterBtn.setOnClickListener(v -> filterListByMine());
         publishFilterBtn.setVisibility(isArtist ? View.VISIBLE : View.GONE);
 
+        songPlayingMsg = view.findViewById(R.id.song_playing_message);
+
         adapter = new SongAdapter(getContext(), songList);
         recyclerView.setAdapter(adapter);
 
         FloatingActionButton fab = view.findViewById(R.id.add_song_btn);
         fab.setOnClickListener(v -> openAddSongDialog());
         fab.setVisibility(isArtist ? View.VISIBLE : View.GONE);
-
-        List<Song> playList = MyMediaPlayer.getInstance(getContext()).getPlayList();
 
         FloatingActionButton fabPlaylist = view.findViewById(R.id.fab_playlist);
         fabPlaylist.setOnClickListener(v -> {
@@ -103,6 +105,7 @@ public class HomeFragment extends Fragment {
 
         FloatingActionButton fabPlayer = view.findViewById(R.id.fab_player);
         fabPlayer.setOnClickListener(v -> {
+            List<Song> playList = MyMediaPlayer.getInstance(getContext()).getPlayList();
             if (playList.isEmpty()) {
                 Toast.makeText(getContext(), "Please add song to playlist first.", Toast.LENGTH_SHORT).show();
                 return;
@@ -111,8 +114,18 @@ public class HomeFragment extends Fragment {
                     PlayActivity.class));
         });
 
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        populateSongs(filterStateFav, filterStateMine);
+        if (MyMediaPlayer.getInstance(getContext()).isPlaying()) {
+            songPlayingMsg.setVisibility(View.VISIBLE);
+        } else {
+            songPlayingMsg.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -354,6 +367,16 @@ public class HomeFragment extends Fragment {
                         continue;
                     }
 
+                    List<Song> playlist = MyMediaPlayer.getInstance(getContext()).getPlayList();
+                    boolean isPlaying = false;
+                    if (playlist != null && !playlist.isEmpty()) {
+                        int index = MyMediaPlayer.getInstance(getContext()).getCurrent();
+                        Song song = MyMediaPlayer.getInstance(getContext()).getPlayList().get(index);
+                        if (song.getId().equals(songId)) {
+                            isPlaying = song.isPlaying();
+                        }
+                    }
+
                     List<String> songIds = MyMediaPlayer.getInstance(getContext()).getSongIds();
                     songList.add(
                         new Song(
@@ -361,7 +384,7 @@ public class HomeFragment extends Fragment {
                             songdb.getTitle(),
                             String.join(", ", songdb.getArtists()),
                             songdb.getGenre(),
-                            false,
+                            isPlaying,
                             isFavorite,
                             songIds.contains(songId),
                             0,

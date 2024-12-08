@@ -120,13 +120,14 @@ public class MyMediaPlayer {
 
     public void play() {
         if (playList.isEmpty()) {
-            Log.e("MyMediaPlayer", "Playlist is empty");
             return;
         }
 
         Song song = playList.get(current);
 
+        // Was plying Already
         if (mediaPlayer != null && playbackPosition > 0) {
+            song.setPlaying(true);
             mediaPlayer.seekTo(playbackPosition);
             mediaPlayer.start();
             notifyOnPlay(song);
@@ -187,6 +188,7 @@ public class MyMediaPlayer {
             playbackPosition = mediaPlayer.getCurrentPosition();
             mediaPlayer.pause();
             Song song = playList.get(current);
+            song.setPlaying(false);
             notifyOnPause(song);
         }
     }

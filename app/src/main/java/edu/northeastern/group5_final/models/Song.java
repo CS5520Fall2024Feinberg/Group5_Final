@@ -118,4 +118,6 @@ public class Song {
     public void setInPlaylist(boolean inPlaylist) {
         this.inPlaylist = inPlaylist;
     }
+
+
 }

@@ -1,8 +1,12 @@
 package edu.northeastern.group5_final.adapters;
 
+import static java.security.AccessController.getContext;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.media.Image;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -65,6 +69,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     public void onBindViewHolder(@NonNull SongViewHolder holder, int p) {
         int position = holder.getAdapterPosition();
         Song song = songs.get(position);
+        boolean playerIsPlaying = MyMediaPlayer.getInstance(this.context).isPlaying();
 
         if (currentlyPlayingIndex == -1 && song.isPlaying()) {
             currentlyPlayingIndex = position;
@@ -92,12 +97,48 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             }
         });
 
-        holder.playPauseButton.setImageResource(song.isPlaying() ? R.drawable.pauset : R.drawable.playt);
+        if (MyMediaPlayer.getInstance(this.context).isPlaying()) {
+            GradientDrawable roundedRectangle = new GradientDrawable();
+            roundedRectangle.setColor(Color.WHITE);
+            roundedRectangle.setStroke(2, Color.BLACK);
+            roundedRectangle.setCornerRadius(12f);
+
+            holder.playPauseButton.setClickable(false);
+            holder.playPauseButton.setBackground(roundedRectangle);
+            int paddingInDp = 5;
+            int paddingInPx = (int) (context.getResources().getDisplayMetrics().density * paddingInDp + 0.5f);
+            holder.playPauseButton.setPadding(paddingInPx, paddingInPx, paddingInPx, paddingInPx);
+
+            if (holder.playPauseButton instanceof ImageView) {
+                (holder.playPauseButton).setScaleType(ImageView.ScaleType.CENTER_CROP);
+            }
+
+            Glide.with(context)
+                    .asGif()
+                    .load(R.drawable.song_playing)
+                    .placeholder(R.drawable.music)
+                    .into(holder.playPauseButton);
+        } else {
+            holder.playPauseButton.setBackground(null);
+            holder.playPauseButton.setPadding(0, 0, 0, 0);
+            holder.playPauseButton.setClickable(true);
+
+            if (holder.playPauseButton instanceof ImageView) {
+                ((ImageView) holder.playPauseButton).setScaleType(ImageView.ScaleType.FIT_CENTER);
+            }
+
+            holder.playPauseButton.setImageResource(song.isPlaying() ? R.drawable.pauset : R.drawable.playt);
+        }
+
+
         holder.favoriteButton.setImageResource(song.isFavorite() ? R.drawable.heartfilled48 : R.drawable.heartunfilled48);
         holder.btnAddSong.setImageResource(song.isInPlaylist() ? R.drawable.added : R.drawable.add_playlist);
-        holder.progressBar.setVisibility(song.isPlaying() ? View.VISIBLE : View.GONE);
+        holder.progressBar.setVisibility((song.isPlaying() && !playerIsPlaying) ? View.VISIBLE : View.GONE);
 
         holder.playPauseButton.setOnClickListener(v -> {
+            if (MyMediaPlayer.getInstance(this.context).isPlaying()) {
+                return;
+            }
             if (song.isPlaying()) {
                 pauseSong(position);
             } else {
@@ -255,10 +296,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
     static class SongViewHolder extends RecyclerView.ViewHolder {
         TextView songTitle, songArtist, songGenre, songInfo;
-        ImageButton playPauseButton, favoriteButton;
+        ImageButton favoriteButton;
         ProgressBar progressBar;
         MaterialCardView card;
-        ImageView btnAddSong;
+        ImageView playPauseButton, btnAddSong;
 
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);

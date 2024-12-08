@@ -203,8 +203,7 @@ public class ProfileFragment extends Fragment {
                         .error(R.drawable.single_artist_icon)
                         .circleCrop()
                         .into(profileImage);
-            }).addOnFailureListener(exception -> {// incase failure with connecting to db storage
-                Log.e("ProfileFragment", "Failed to get download URL", exception);
+            }).addOnFailureListener(exception -> {
 
                 Glide.with(getContext())
                         .load(R.drawable.single_artist_icon)

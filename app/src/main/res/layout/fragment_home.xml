@@ -6,69 +6,85 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-    <androidx.recyclerview.widget.RecyclerView
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/song_list_recycler_view"
-        android:layout_marginTop="110dp"
-        android:clipToPadding="false"
-        android:paddingBottom="350dp" />
+        android:orientation="vertical"
+        android:layout_marginTop="20dp"
+        >
 
-    <LinearLayout
-        android:id="@+id/button_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:gravity="start"
-        android:orientation="horizontal"
-        android:layout_marginTop="50dp"
-        android:padding="10dp">
-
-<!--        <Button-->
-<!--            android:id="@+id/btn_sign_in"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Sign In"-->
-<!--            android:textSize="13dp"-->
-<!--            android:padding="10dp"-->
-<!--            android:backgroundTint="@color/green"-->
-<!--            android:textColor="@android:color/white"-->
-<!--            android:layout_marginTop="8dp" />-->
-
-        <Button
-            android:id="@+id/favorite_filter_btn"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_height="45dp"
-            android:layout_marginEnd="8dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:text="My Favorite Songs"
-            android:textSize="14sp"
-            android:backgroundTint="@color/darkgray"
-            android:textColor="@android:color/white"
-            />
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
+            android:layout_marginHorizontal="5dp"
+            android:padding="8dp">
 
-        <Button
-            android:id="@+id/publish_filter_btn"
+            <Button
+                android:id="@+id/favorite_filter_btn"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_height="45dp"
+                android:layout_marginEnd="8dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="My Favorite Songs"
+                android:textSize="14sp"
+                android:backgroundTint="@color/darkgray"
+                android:textColor="@android:color/white"
+                />
+
+            <Button
+                android:id="@+id/publish_filter_btn"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="13dp"
+                android:layout_height="45dp"
+                android:layout_marginEnd="8dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="Published By Me"
+                android:textSize="14sp"
+                android:backgroundTint="@color/darkgray"
+                android:textColor="@android:color/white"
+                />
+
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/song_playing_message"
             android:layout_width="wrap_content"
-            android:layout_marginLeft="13dp"
-            android:layout_height="45dp"
-            android:layout_marginEnd="8dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:text="Published By Me"
-            android:textSize="14sp"
-            android:backgroundTint="@color/darkgray"
-            android:textColor="@android:color/white"
-            />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Your Playlist is Live on the Player 🎧"
+            android:textColor="#FBAB98"
+            android:textSize="12sp"
+            android:paddingVertical="5dp"
+            android:visibility="gone" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/song_list_recycler_view"
+            android:clipToPadding="false"
+            android:layout_marginHorizontal="5dp"
+            android:paddingBottom="350dp" />
 
     </LinearLayout>
+
+
+
+
+
+
+
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

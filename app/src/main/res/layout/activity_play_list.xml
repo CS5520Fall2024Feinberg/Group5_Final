@@ -36,7 +36,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:reverseLayout="false"
         tools:listitem="@layout/item_music_play"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,7 +52,8 @@
         android:text="Why so empty!? Start adding some songs."
         android:textColor="@color/colorGray"
         android:textSize="15sp"
-        android:gravity="center" />
+        android:gravity="center"
+        android:visibility="gone"/>
 
     </LinearLayout>
 
