@@ -22,11 +22,16 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.SongVi
 
     private final List<Song> songs;
     private final Context context;
+    private final OnItemClickListener listener;
 
+    public interface OnItemClickListener {
+        void onItemClick(Song song, int position);
+    }
 
-    public PlayListAdapter(Context context, List<Song> songs) {
+    public PlayListAdapter(Context context, List<Song> songs, OnItemClickListener listener) {
         this.context = context;
         this.songs = songs;
+        this.listener = listener;
     }
 
     @NonNull
@@ -37,19 +42,17 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.SongVi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SongViewHolder holder, int p) {
-        int position = holder.getAdapterPosition();
+    public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song song = songs.get(position);
         holder.songTitle.setText(song.getTitle());
         holder.songArtist.setText(song.getArtist());
 
-        if (p == MyMediaPlayer.getInstance(context).getCurrent() && MyMediaPlayer.getInstance(context).isPlaying()) {
+        if (position == MyMediaPlayer.getInstance(context).getCurrent() && MyMediaPlayer.getInstance(context).isPlaying()) {
             Glide.with(context)
                     .asGif()
                     .load(R.drawable.song_playing)
                     .placeholder(R.drawable.music)
                     .into(holder.imvIsplaying);
-
         } else {
             Glide.with(context)
                     .asGif()
@@ -57,6 +60,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.SongVi
                     .placeholder(R.drawable.music)
                     .into(holder.imvIsplaying);
         }
+
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(song, holder.getAdapterPosition()));
     }
 
     @Override
@@ -66,15 +71,15 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.SongVi
 
     static class SongViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView songTitle, songArtist, tvType;
-        private ImageView imvIsplaying;
+        private final TextView songTitle;
+        private final TextView songArtist;
+        private final ImageView imvIsplaying;
 
         public SongViewHolder(@NonNull View itemView) {
             super(itemView);
             songTitle = itemView.findViewById(R.id.song_title);
             songArtist = itemView.findViewById(R.id.song_artist);
             imvIsplaying = itemView.findViewById(R.id.icon_isplaying);
-
         }
     }
 }
