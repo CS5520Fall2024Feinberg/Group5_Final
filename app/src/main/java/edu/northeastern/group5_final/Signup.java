@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,23 +14,16 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -43,16 +35,13 @@ import java.util.Map;
 public class Signup extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-    private static final int PICK_IMAGE_REQUEST = 1;
-
     ImageView ivProfilePicture;
     EditText etxtName, etxtUsername, etxtEmail, etxtPassword, etxtRePassword;
     Uri profilePictureUri;
     FirebaseDatabase database;
     DatabaseReference artistsRef;
     RadioGroup radioGroup;
-    String role;
-
+    String role = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,17 +59,13 @@ public class Signup extends AppCompatActivity {
         etxtRePassword = findViewById(R.id.et_reenter_password);
 
         radioGroup = findViewById(R.id.rg_artist_band);
-        radioGroup = findViewById(R.id.rg_artist_band);
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rb_yes) {
                 role = "ARTIST";
             } else if (checkedId == R.id.rb_no) {
                 role = "LISTENER";
             }
-            Log.d("TAG", "onCreate: " + role);
         });
-
-
 
         Button btnSignup = findViewById(R.id.btn_sign_up);
         btnSignup.setOnClickListener(view -> signUp());
@@ -119,14 +104,13 @@ public class Signup extends AppCompatActivity {
     }
 
     private void signUp() {
-
         String name = etxtName.getText().toString().trim();
         String username = etxtUsername.getText().toString().trim();
         String password = etxtPassword.getText().toString().trim();
         String passwordRe = etxtRePassword.getText().toString().trim();
         String email = etxtEmail.getText().toString().trim();
 
-        if (email.isEmpty() || name.isEmpty() || username.isEmpty() || password.isEmpty()) {
+        if (name.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty() || passwordRe.isEmpty()) {
             Toast.makeText(Signup.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -138,21 +122,21 @@ public class Signup extends AppCompatActivity {
             Toast.makeText(Signup.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (role == null) {
+            Toast.makeText(Signup.this, "Please select a role before signing up", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         database = FirebaseDatabase.getInstance();
         artistsRef = database.getReference("artists");
 
-        artistsRef.orderByChild("username").equalTo(username).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
+        artistsRef.orderByChild("username").equalTo(username).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                if (task.getResult().exists()) {
                     Toast.makeText(Signup.this, "Username already exists", Toast.LENGTH_SHORT).show();
                 } else {
                     if (profilePictureUri != null) {
-                        StorageReference storageReference = FirebaseStorage
-                                .getInstance()
-                                .getReference("profile_pictures/" + username + ".jpg");
-
+                        StorageReference storageReference = FirebaseStorage.getInstance().getReference("profile_pictures/" + username + ".jpg");
                         storageReference.putFile(profilePictureUri)
                                 .addOnSuccessListener(taskSnapshot -> {
                                     storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
@@ -165,20 +149,18 @@ public class Signup extends AppCompatActivity {
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(Signup.this, "Failed to upload profile picture", Toast.LENGTH_SHORT).show();
                                 });
-
-
                     } else {
+                        // No profile picture selected
                         saveUserData(name, username, email, password, null);
                     }
                 }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            } else {
+                Toast.makeText(Signup.this, "Error checking username availability", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void saveUserData(String name, String username, String email, String password, @Nullable String profilePictureUrl) {
+    private void saveUserData(String name, String username, String email, String password, String profilePictureUrl) {
         Map<String,String> userData = new HashMap<>();
         userData.put("name", name);
         userData.put("username", username);
@@ -188,14 +170,13 @@ public class Signup extends AppCompatActivity {
         userData.put("bio", "");
         userData.put("role", role);
 
-        if (profilePictureUrl != null) {
+        if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
             userData.put("profilePictureUrl", profilePictureUrl);
         }
 
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-
                         artistsRef.push().setValue(userData).addOnSuccessListener(unused -> {
 
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -203,19 +184,20 @@ public class Signup extends AppCompatActivity {
                                     .setDisplayName(username).build();
 
                             user.updateProfile(profileUpdates)
-                                .addOnCompleteListener(task1 -> {
-                                    if (task1.isSuccessful()) {
-                                        Toast.makeText(Signup.this, "Signup successful", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(Signup.this, Dashboard.class);
-                                        intent.putExtra("username", username);
-                                        startActivity(intent);
-                                        finish();
-                                    }
-                                });
-
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            Toast.makeText(Signup.this, "Signup successful", Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(Signup.this, Dashboard.class);
+                                            intent.putExtra("username", username);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            Toast.makeText(Signup.this, "Failed to set display name", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
 
                         }).addOnFailureListener(e -> {
-                            Toast.makeText(Signup.this, "Signup failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Signup.this, "Signup failed while saving data", Toast.LENGTH_SHORT).show();
                         });
 
                     } else {

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -35,9 +34,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         if (firebaseAuth.getCurrentUser() != null) {
-            startActivity(new Intent(this, Dashboard.class));
-            setUserRole();
-            finish();
+            setUserRoleAndProceed();
             return;
         }
 
@@ -59,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             String username = etxtUsername.getText().toString().trim();
             String password = etxtPassword.getText().toString().trim();
 
-            //check if username and password are empty
+            // Check if username and password are empty
             if (username.isEmpty() || password.isEmpty()) {
                 Toast.makeText(MainActivity.this, "Please enter both username and password!", Toast.LENGTH_SHORT).show();
                 return;
@@ -72,44 +69,48 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()){
+                        boolean authenticated = false;
                         for (DataSnapshot userSnapshot : snapshot.getChildren()){
                             String storedPassword = userSnapshot.child("password").getValue(String.class);
-                            if(storedPassword.equals(password) && storedPassword != null){
-                                Toast.makeText(MainActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                            String storedEmail = userSnapshot.child("email").getValue(String.class);
 
-                                    String storedEmail = userSnapshot.child("email").getValue(String.class);
-                                    firebaseAuth.signInWithEmailAndPassword(storedEmail, password)
+                            if (storedPassword != null && storedPassword.equals(password)) {
+                                authenticated = true;
+                                firebaseAuth.signInWithEmailAndPassword(storedEmail, password)
                                         .addOnCompleteListener(task -> {
                                             if (task.isSuccessful()) {
                                                 Utils.fetchSelfUserData(MainActivity.this, new Utils.UserCallback() {
                                                     @Override
                                                     public void onSuccess(ArtistDBModel selfUser) {
-                                                        Log.d("TAG", "onSuccess: " + selfUser.getRole());
-                                                        SharedPreferenceManager.saveUserRole(MainActivity.this, selfUser.getRole());
+                                                        String role = selfUser.getRole() == null ? "LISTENER" : selfUser.getRole();
+                                                        SharedPreferenceManager.saveUserRole(MainActivity.this, role);
+                                                        Intent intent = new Intent(MainActivity.this, Dashboard.class);
+                                                        intent.putExtra("username", username);
+                                                        startActivity(intent);
+                                                        finish();
                                                     }
 
                                                     @Override
                                                     public void onFailure(String errorMessage) {
                                                         Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                                                        SharedPreferenceManager.saveUserRole(MainActivity.this, "LISTENER");
+                                                        Intent intent = new Intent(MainActivity.this, Dashboard.class);
+                                                        intent.putExtra("username", username);
+                                                        startActivity(intent);
+                                                        finish();
                                                     }
                                                 });
-
-                                                Intent intent = new Intent(MainActivity.this, Dashboard.class);
-                                                intent.putExtra("username", username);
-                                                startActivity(intent);
-                                                finish();
                                             } else {
-                                                Toast.makeText(MainActivity.this, "Sign-up failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(MainActivity.this, "Sign-in failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
-                                return;
-                            }
-                            else{
-                                Toast.makeText(MainActivity.this, "Incorrect password", Toast.LENGTH_SHORT).show();
+                                break;
                             }
                         }
-                    }
-                    else{
+                        if (!authenticated) {
+                            Toast.makeText(MainActivity.this, "Incorrect password", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
                         Toast.makeText(MainActivity.this, "Username not found", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -128,17 +129,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setUserRole() {
+    private void setUserRoleAndProceed() {
         Utils.fetchSelfUserData(MainActivity.this, new Utils.UserCallback() {
             @Override
             public void onSuccess(ArtistDBModel selfUser) {
-                Log.d("TAG", "Updated: " + selfUser.getRole());
-                SharedPreferenceManager.saveUserRole(MainActivity.this, selfUser.getRole());
+                String role = selfUser.getRole() == null ? "LISTENER" : selfUser.getRole();
+                SharedPreferenceManager.saveUserRole(MainActivity.this, role);
+                startActivity(new Intent(MainActivity.this, Dashboard.class));
+                finish();
             }
 
             @Override
             public void onFailure(String errorMessage) {
                 Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                SharedPreferenceManager.saveUserRole(MainActivity.this, "LISTENER");
+                startActivity(new Intent(MainActivity.this, Dashboard.class));
+                finish();
             }
         });
     }

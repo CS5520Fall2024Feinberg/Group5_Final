@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="edu.northeastern.group5_final"
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-
 
     <application
         android:allowBackup="true"
@@ -16,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Group5_final"
         tools:targetApi="31">
+
         <activity
             android:name=".Dashboard"
             android:exported="false">
@@ -24,21 +26,27 @@
         <activity
             android:name=".messaging.InboxActivity"
             android:exported="false" />
+
         <activity
             android:name=".SearchActivity"
             android:exported="false" />
+
         <activity
             android:name=".loginPage"
             android:exported="false" />
+
         <activity
             android:name=".Signup"
             android:exported="false" />
+
         <activity
             android:name=".PlayActivity"
             android:exported="false" />
+
         <activity
             android:name=".PlayListActivity"
             android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
