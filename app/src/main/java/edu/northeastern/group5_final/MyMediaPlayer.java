@@ -170,7 +170,8 @@ public class MyMediaPlayer {
             Log.e("MyMediaPlayer", "Playlist is empty");
             return;
         }
-        current = (current + 1) % playList.size(); // Loop back to the start
+        current = (current + 1) % playList.size();
+        stop();
         play();
     }
 
