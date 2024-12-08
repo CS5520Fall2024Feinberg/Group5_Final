@@ -76,18 +76,25 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         holder.progressBar.setProgress(song.getProgress());
         holder.btnAddSong.setOnClickListener(v -> {
             List<Song> playList = MyMediaPlayer.getInstance(context).getPlayList();
-            if (!playList.contains(song)){
+            List<String> songIds = MyMediaPlayer.getInstance(context).getSongIds();
+
+            // Add Song
+            if (!songIds.contains(song.getId())){
                 MyMediaPlayer.getInstance(context).addSong(song);
                 holder.btnAddSong.setImageResource(R.drawable.added);
-            }else {
-                MyMediaPlayer.getInstance(context).removeSong(song);
-                holder.btnAddSong.setImageResource(R.drawable.add_playlist);
+                song.setInPlaylist(true);
             }
-            Log.d("TAG", "onBindViewHolder: " + playList.size());
+            // Remove Song
+            else {
+                MyMediaPlayer.getInstance(context).removeSongById(song.getId());
+                holder.btnAddSong.setImageResource(R.drawable.add_playlist);
+                song.setInPlaylist(false);
+            }
         });
 
         holder.playPauseButton.setImageResource(song.isPlaying() ? R.drawable.pauset : R.drawable.playt);
         holder.favoriteButton.setImageResource(song.isFavorite() ? R.drawable.heartfilled48 : R.drawable.heartunfilled48);
+        holder.btnAddSong.setImageResource(song.isInPlaylist() ? R.drawable.added : R.drawable.add_playlist);
         holder.progressBar.setVisibility(song.isPlaying() ? View.VISIBLE : View.GONE);
 
         holder.playPauseButton.setOnClickListener(v -> {

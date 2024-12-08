@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import edu.northeastern.group5_final.models.Song;
 
@@ -215,7 +216,28 @@ public class MyMediaPlayer {
         }
     }
 
+    public void removeSongById(String songId) {
+        playList.removeIf(song -> song.getId().equals(songId));
+        if (current >= playList.size()) {
+            current = Math.max(0, playList.size() - 1);
+        }
+    }
+
+
     public List<Song> getPlayList() {
         return new ArrayList<>(playList);
     }
+
+    public List<String> getSongIds() {
+        return playList
+                .stream()
+                .map(Song::getId)
+                .collect(Collectors.toList());
+    }
+
+    public void renewList(List<Song> newPlaylist) {
+        playList.clear();
+        playList.addAll(newPlaylist);
+    }
+
 }

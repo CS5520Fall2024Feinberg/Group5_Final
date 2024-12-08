@@ -354,23 +354,23 @@ public class HomeFragment extends Fragment {
                         continue;
                     }
 
+                    List<String> songIds = MyMediaPlayer.getInstance(getContext()).getSongIds();
                     songList.add(
-                            new Song(
-                                    songId,
-                                    songdb.getTitle(),
-                                    String.join(", ", songdb.getArtists()),
-                                    songdb.getGenre(),
-                                    false,
-                                    isFavorite,
-                                    0,
-                                    songdb.getUrl(),
-                                    songdb.getLikedBy() == null ? 0 : songdb.getLikedBy().size(),
-                                    songdb.getReleaseDate()
-                            )
+                        new Song(
+                            songId,
+                            songdb.getTitle(),
+                            String.join(", ", songdb.getArtists()),
+                            songdb.getGenre(),
+                            false,
+                            isFavorite,
+                            songIds.contains(songId),
+                            0,
+                            songdb.getUrl(),
+                            songdb.getLikedBy() == null ? 0 : songdb.getLikedBy().size(),
+                            songdb.getReleaseDate()
+                        )
                     );
                 }
-
-
                 adapter.notifyDataSetChanged();
             }
 

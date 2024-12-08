@@ -1,6 +1,8 @@
 package edu.northeastern.group5_final;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +14,8 @@ import edu.northeastern.group5_final.adapters.PlayListAdapter;
 import edu.northeastern.group5_final.models.Song;
 
 public class PlayListActivity extends AppCompatActivity implements MyMediaPlayer.Callback {
+
+    TextView emptyMsg;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,6 +29,16 @@ public class PlayListActivity extends AppCompatActivity implements MyMediaPlayer
         super.onResume();
         List<Song> playList = MyMediaPlayer.getInstance(this).getPlayList();
         RecyclerView playListView = findViewById(R.id.playList);
+        emptyMsg = findViewById(R.id.no_list_msg);
+
+        if (playList.isEmpty()) {
+            playListView.setVisibility(View.GONE);
+            emptyMsg.setVisibility(View.VISIBLE);
+        } else {
+            playListView.setVisibility(View.VISIBLE);
+            emptyMsg.setVisibility(View.GONE);
+        }
+
         playListView.setAdapter(new PlayListAdapter(this, playList));
     }
 

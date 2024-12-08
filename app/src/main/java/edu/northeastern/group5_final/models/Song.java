@@ -7,12 +7,13 @@ public class Song {
     private String genre;
     private boolean isPlaying;
     private boolean isFavorite;
+    private boolean inPlaylist;
     private int progress;
     private String songUrl;
     private int likedBy;
     private String releaseDate;
 
-    public Song(String id, String title, String artist, String genre, boolean isPlaying, boolean isFavorite, int progress, String songUrl, int likedBy, String releaseDate) {
+    public Song(String id, String title, String artist, String genre, boolean isPlaying, boolean isFavorite, boolean inPlaylist, int progress, String songUrl, int likedBy, String releaseDate) {
 
         this.id = id;
         this.title = title;
@@ -20,6 +21,7 @@ public class Song {
         this.genre = genre;
         this.isPlaying = isPlaying;
         this.isFavorite = isFavorite;
+        this.inPlaylist = inPlaylist;
         this.progress = progress;
         this.songUrl = songUrl;
         this.likedBy = likedBy;
@@ -109,4 +111,11 @@ public class Song {
         this.songUrl = songUrl;
     }
 
+    public boolean isInPlaylist() {
+        return inPlaylist;
+    }
+
+    public void setInPlaylist(boolean inPlaylist) {
+        this.inPlaylist = inPlaylist;
+    }
 }
