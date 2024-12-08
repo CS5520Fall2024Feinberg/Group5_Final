@@ -1,140 +1,160 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main"
-    android:padding="16dp"
-    android:background="@color/white">
+    >
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/iv_center_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="25dp"
-        android:paddingHorizontal="15dp"
-        >
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:src="@drawable/signinbg"
+        android:scaleType="centerCrop"
+        android:alpha="0.4" />
 
-        <ImageView
-            android:id="@+id/iv_add_picture"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:scaleType="centerCrop"
-            android:src="@drawable/add_profile"
-            android:padding="20dp"
-            android:layout_marginBottom="16dp"
-        />
+    <ScrollView
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
-
-        <EditText
-            android:id="@+id/et_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Stage Name"
-            android:textColor="@color/black"
-            android:inputType="textPersonName"
-            android:padding="12dp"
-            android:textColorHint="@color/darkgray"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="16dp" />
-
-        <EditText
-            android:id="@+id/et_username"
-            android:layout_width="match_parent"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"
-            android:textColorHint="@color/darkgray"
-            android:hint="Username"
-            android:inputType="textPersonName"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="16dp" />
-
-        <EditText
-            android:id="@+id/et_email"
-            android:layout_width="match_parent"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"
-            android:textColorHint="@color/darkgray"
-            android:hint="Email"
-            android:inputType="textPersonName"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="16dp" />
-
-        <EditText
-            android:id="@+id/et_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:textColor="@color/black"
-            android:inputType="textPassword"
-            android:textColorHint="@color/darkgray"
-            android:padding="12dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="16dp" />
-
-        <EditText
-            android:id="@+id/et_reenter_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Re-enter Password"
-            android:inputType="textPassword"
-            android:padding="12dp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/darkgray"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginBottom="12dp" />
-
-        <TextView
-            android:id="@+id/tv_are_you_artist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Define Your Groove"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
-            android:textColor="@android:color/black" />
-
-        <RadioGroup
-            android:id="@+id/rg_artist_band"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:checkedButton="@id/rb_yes">
+            android:layout_marginTop="25dp"
+            android:paddingHorizontal="15dp">
 
-            <RadioButton
-                android:id="@+id/rb_yes"
-                android:layout_width="wrap_content"
+            <ImageView
+                android:id="@+id/iv_add_picture"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="centerCrop"
+                android:src="@drawable/add_profile"
+                android:padding="20dp"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🎹 Music Maker (Artist)"
+                android:hint="Stage Name"
                 android:textColor="@color/black"
-                android:layout_marginEnd="16dp" />
+                android:inputType="textPersonName"
+                android:padding="12dp"
+                android:textColorHint="@color/darkgray"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginBottom="16dp" />
 
-            <RadioButton
-                android:id="@+id/rb_no"
+            <EditText
+                android:id="@+id/et_username"
+                android:layout_width="match_parent"
                 android:textColor="@color/black"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🎧 Music Lover (Listener)" />
-        </RadioGroup>
+                android:textColorHint="@color/darkgray"
+                android:hint="Username"
+                android:inputType="textPersonName"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginBottom="16dp" />
 
-        <Button
-            android:id="@+id/btn_sign_up"
+            <EditText
+                android:id="@+id/et_email"
+                android:layout_width="match_parent"
+                android:textColor="@color/black"
+                android:layout_height="wrap_content"
+                android:textColorHint="@color/darkgray"
+                android:hint="Email"
+                android:inputType="textPersonName"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/et_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:textColor="@color/black"
+                android:inputType="textPassword"
+                android:textColorHint="@color/darkgray"
+                android:padding="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/et_reenter_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Re-enter Password"
+                android:inputType="textPassword"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/darkgray"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginBottom="12dp" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign Up"
-            android:backgroundTint="@color/green"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="24dp" />
+            android:orientation="vertical"
+            android:background="@drawable/edit_text_border"
+            android:paddingHorizontal="15dp">
 
-        <Button
-            android:id="@+id/btn_sign_in"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sign In"
-            android:backgroundTint="@android:color/darker_gray"
-            android:textColor="@android:color/white"
-            android:layout_marginTop="8dp" />
+            <TextView
+                android:id="@+id/tv_are_you_artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Define Your Groove"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:textColor="@android:color/black" />
 
-    </LinearLayout>
-</ScrollView>
+            <RadioGroup
+                android:id="@+id/rg_artist_band"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:checkedButton="@id/rb_yes">
+
+                <RadioButton
+                    android:id="@+id/rb_yes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎹 Music Maker (Artist)"
+                    android:textColor="@color/black"
+                    android:layout_marginEnd="16dp" />
+
+                <RadioButton
+                    android:id="@+id/rb_no"
+                    android:textColor="@color/black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎧 Music Lover (Listener)" />
+            </RadioGroup>
+
+        </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_sign_up"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sign Up"
+                android:backgroundTint="@color/green"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="24dp" />
+
+            <Button
+                android:id="@+id/btn_sign_in"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sign In"
+                android:backgroundTint="@android:color/darker_gray"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
